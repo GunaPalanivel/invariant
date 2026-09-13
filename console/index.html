@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invariant · Runs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="1">
+  <header class="topbar">
+    <a class="wordmark" href="index.html">Invariant</a>
+    <nav aria-label="Primary">
+      <a class="active" href="index.html">Runs</a>
+    </nav>
+    <div class="account" aria-label="Account menu for operator">
+      <span class="avatar">IN</span>
+      <span class="account-label">operator</span>
+    </div>
+  </header>
+  <main class="page">
+    <div class="brand-bar"></div>
+    <h1>Runs</h1>
+    <p class="lede">Incident to application regression. Injected transport unless a bound live URL is shown.</p>
+    <div class="toolbar">
+      <button class="btn primary" type="button">New run</button>
+    </div>
+    <div class="filters">
+      <input id="search" type="search" placeholder="Search title or run ID">
+      <select id="outcome-filter">
+        <option value="all">All outcomes</option>
+        <option value="complete">complete</option>
+        <option value="incomplete">incomplete</option>
+        <option value="unknown">unknown</option>
+      </select>
+      <span id="count-note" class="count-note"></span>
+    </div>
+    <div class="pager">
+      <select id="page-size"><option>50</option><option>100</option></select>
+      <button type="button" data-prev>Prev</button>
+      <span data-pages></span>
+      <button type="button" data-next>Next</button>
+      <span class="count-note" data-range></span>
+    </div>
+    <div class="table-wrap table-scroll" data-mode="full">
+      <table class="runs">
+        <thead>
+          <tr>
+            <th>Incident</th>
+            <th>Updated</th>
+            <th>Affected operation</th>
+            <th>Stage progress</th>
+            <th>Outcome</th>
+            <th>Next action</th>
+          </tr>
+        </thead>
+        <tbody id="runs-body"></tbody>
+      </table>
+    </div>
+    <div id="run-cards" class="cards"></div>
+    <div class="pager">
+      <button type="button" data-prev>Prev</button>
+      <span data-pages></span>
+      <button type="button" data-next>Next</button>
+      <span class="count-note" data-range></span>
+    </div>
+  </main>
+  <script src="runs-data.js"></script>
+  <script src="app.js"></script>
+  <script>InvariantConsole.bindRuns();</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invariant · Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="index.html">Invariant</a>
+    <nav aria-label="Primary">
+      <a href="index.html">Runs</a>
+    </nav>
+    <div class="account" aria-label="Account menu for operator">
+      <span class="avatar">IN</span>
+      <span class="account-label">operator</span>
+    </div>
+  </header>
+  <main class="page">
+    <a class="crumb" href="index.html">← All runs</a>
+    <div class="brand-bar"></div>
+    <div class="toolbar">
+      <h1 id="run-title">Run</h1>
+      <button class="btn" id="refresh" type="button">Refresh</button>
+    </div>
+    <div class="identity">
+      <div class="id-box"><div class="k">Run ID</div><div class="v" id="run-id"></div><button class="copy" id="copy-run" type="button">Copy</button></div>
+      <div class="id-box"><div class="k">Application commit</div><div class="v" id="aut-rev"></div><button class="copy" id="copy-sha" type="button">Copy</button></div>
+      <div class="id-box"><div class="k">Regression</div><div class="v" id="test-hash"></div><button class="copy" id="copy-hash" type="button">Copy</button></div>
+      <div class="id-box"><div class="k">Origin</div><div class="v"><span class="badge" id="origin-badge"></span></div></div>
+    </div>
+    <p class="caption">Select a stage to read its evidence.</p>
+    <div id="pipeline" class="pipeline"></div>
+    <div id="stage-panel"></div>
+  </main>
+  <script src="runs-data.js"></script>
+  <script src="app.js"></script>
+  <script>InvariantConsole.bindDetail();</script>
+</body>
+</html>
