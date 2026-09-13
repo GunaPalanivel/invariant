@@ -34,6 +34,7 @@ results/baseline.md
 results/_baseline_*
 results/demo/
 *.png
+!docs/evidence/*.png
 
 # Validation clone must never live inside this product tree
 invariant-validation/
