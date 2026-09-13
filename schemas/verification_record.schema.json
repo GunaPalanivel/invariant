@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/verification_record.json",
+  "title": "VerificationRecord",
+  "description": "A verdict is valid only when workflow, attempt, AUT revision, test hash, and required outcomes all match the producing run.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "workflow_id",
+    "run_attempt",
+    "aut_revision",
+    "generated_test_hash",
+    "required_outcomes",
+    "result_class",
+    "named_assertion",
+    "test_origin"
+  ],
+  "properties": {
+    "workflow_id": { "type": "string" },
+    "run_attempt": { "type": "integer", "minimum": 1 },
+    "aut_revision": { "type": "string" },
+    "generated_test_hash": { "type": "string" },
+    "required_outcomes": { "type": "object" },
+    "result_class": { "$ref": "execution_result_class.json" },
+    "named_assertion": { "type": "string" },
+    "test_origin": {
+      "type": "string",
+      "enum": ["handwritten", "generated", "weak_control"]
+    },
+    "application_outcome": {
+      "type": "string",
+      "enum": ["complete", "incomplete", "unknown"]
+    },
+    "case_id": { "type": "string" }
+  }
+}

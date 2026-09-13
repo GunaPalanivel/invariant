@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "family": "ambiguous_external_write_lost_ack",
+  "destination": "C-HOLDOUT",
+  "operation_id": "changelog-2026-09-13",
+  "content": "Changelog published for 2026-09-13.",
+  "completion_rule": "Holdout: same family, independently authored before seeing generator output. One message per (C-HOLDOUT, changelog-2026-09-13). Unknown after dispatched+lost ack with incomplete read. Send once if never dispatched. New operation_id with the same body is allowed.",
+  "cases": {
+    "holdout_original_duplicate": {
+      "policy": "blind_retry",
+      "fault": "commit_drop_ack",
+      "named_assertion": "no_duplicate_for_operation",
+      "required_result_class": "intended_assertion_failed",
+      "required_application_outcome": "incomplete"
+    },
+    "holdout_incomplete_degraded": {
+      "policy": "search_then_retry",
+      "fault": "commit_drop_ack",
+      "query": "truncated_empty",
+      "named_assertion": "no_duplicate_for_operation",
+      "required_result_class": "intended_assertion_failed",
+      "required_application_outcome": "incomplete"
+    },
+    "holdout_correct_unknown": {
+      "policy": "reconcile",
+      "fault": "commit_drop_ack",
+      "query": "omit_metadata",
+      "named_assertion": "unknown_after_ambiguous_dispatch",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "unknown"
+    },
+    "holdout_correct_send_once": {
+      "policy": "reconcile",
+      "fault": "block_before_dispatch",
+      "named_assertion": "completes_missing_work",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "complete"
+    }
+  }
+}

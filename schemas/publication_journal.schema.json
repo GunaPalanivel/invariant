@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/publication_journal.json",
+  "title": "PublicationJournal",
+  "description": "Stable run_id plus persisted object IDs. Reconcile (GET stored IDs) before any uncertain write. Unknown prior write → no second PR/comment/reply.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id"],
+  "properties": {
+    "run_id": { "type": "string" },
+    "slack_channel_id": { "type": ["string", "null"] },
+    "slack_thread_ts": { "type": ["string", "null"] },
+    "slack_reply_ts": { "type": ["string", "null"] },
+    "slack_reply_status": {
+      "type": ["string", "null"],
+      "enum": ["pending", "published", "failed", "unknown", null]
+    },
+    "linear_issue_id": { "type": ["string", "null"] },
+    "linear_comment_id": { "type": ["string", "null"] },
+    "linear_comment_status": {
+      "type": ["string", "null"],
+      "enum": ["pending", "published", "failed", "unknown", null]
+    },
+    "github_branch": { "type": ["string", "null"] },
+    "github_pr_number": { "type": ["integer", "null"] },
+    "github_head_sha": { "type": ["string", "null"] },
+    "github_pr_status": {
+      "type": ["string", "null"],
+      "enum": ["pending", "published", "failed", "unknown", null]
+    },
+    "ci_run_id": { "type": ["string", "null"] },
+    "ci_bound": { "type": "boolean" }
+  }
+}

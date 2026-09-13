@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/execution_result_class.json",
+  "title": "ExecutionResultClass",
+  "description": "Only intended_assertion_failed on the named assertion counts as detection.",
+  "type": "string",
+  "enum": [
+    "intended_assertion_passed",
+    "intended_assertion_failed",
+    "invalid_test",
+    "skipped",
+    "infrastructure_failure"
+  ]
+}

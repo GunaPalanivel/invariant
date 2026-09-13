@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/model_derived_contract.json",
+  "title": "ModelDerivedContract",
+  "description": "Contract derived from incident evidence only. Grounding judge checks spans against raw text, never against ExpectedIntent.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "destination",
+    "operation_id",
+    "content",
+    "completion_rule",
+    "source_spans",
+    "grounded"
+  ],
+  "properties": {
+    "destination": { "type": ["string", "null"] },
+    "operation_id": { "type": ["string", "null"] },
+    "content": { "type": ["string", "null"] },
+    "completion_rule": { "type": ["string", "null"] },
+    "source_spans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "source", "excerpt", "grounded"],
+        "properties": {
+          "field": { "type": "string" },
+          "source": { "type": "string" },
+          "locator": { "type": ["string", "null"] },
+          "excerpt": { "type": "string" },
+          "grounded": { "type": "boolean" }
+        }
+      }
+    },
+    "grounded": { "type": "boolean" },
+    "ungrounded_fields": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "contract_hash": { "type": "string" }
+  }
+}

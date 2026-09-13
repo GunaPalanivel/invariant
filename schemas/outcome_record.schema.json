@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/outcome_record.json",
+  "title": "OutcomeRecord",
+  "description": "Observer-owned record of what actually happened. AUT cannot write this.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "destination",
+    "operation_id",
+    "content",
+    "message_count",
+    "duplicate",
+    "application_outcome",
+    "evidence_quality"
+  ],
+  "properties": {
+    "destination": { "type": "string" },
+    "operation_id": { "type": "string" },
+    "content": { "type": "string" },
+    "message_count": { "type": "integer", "minimum": 0 },
+    "duplicate": { "type": "boolean" },
+    "task_completion": {
+      "type": "string",
+      "enum": ["complete", "incomplete", "unknown"]
+    },
+    "application_outcome": {
+      "type": "string",
+      "enum": ["complete", "incomplete", "unknown"]
+    },
+    "communication_accuracy": { "type": "string" },
+    "evidence_quality": {
+      "type": "string",
+      "enum": ["live", "injected", "simulated"]
+    }
+  }
+}

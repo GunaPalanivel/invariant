@@ -1,0 +1,1 @@
+"""Release notifier application package."""

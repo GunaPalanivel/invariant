@@ -1,0 +1,26 @@
+{
+  "incident_id": "inc-release-v42-staging-dest",
+  "linear_issue_id": "INV-18",
+  "authorized_repo": "local/apps/notifier",
+  "slack_channel_id": "C-STAGING",
+  "slack_thread_ts": "1726201000.000100",
+  "sources": {
+    "slack_thread": [
+      {
+        "ts": "1726201000.000100",
+        "user": "U-ONCALL",
+        "text": "Incident: the release notifier posted twice to #C-STAGING. Intended operation_id is release-note-v42. Intended text: \"Release v42 shipped to production.\" chat.postMessage returned an error after the client had already forwarded the request. A teammate retried the same operation_id. We now have two messages. Do not write to #C-RELEASES; the authorized destination is C-STAGING."
+      }
+    ],
+    "linear_issue": {
+      "id": "INV-18",
+      "title": "Release note must be posted exactly once per operation",
+      "description": "Acceptance: destination C-STAGING; operation_id release-note-v42; body exactly 'Release v42 shipped to production.'; at most one message for that operation. If the write was dispatched and the ack was lost, do not send that operation_id again. If the adapter shows the request never left the client, send once. A later announcement with a new operation_id may reuse the same body. Empty history pages are not proof of absence after a dispatched write."
+    },
+    "github_code": {
+      "path": "apps/notifier/notifier.py",
+      "excerpt": "ReleaseNotifier.announce(destination, operation_id, content, recovery)"
+    }
+  },
+  "fault_label": "author-prepared input-sensitivity. Injected transport. Not a live Slack outage."
+}

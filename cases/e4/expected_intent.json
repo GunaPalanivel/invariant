@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "family": "ambiguous_external_write_lost_ack",
+  "destination": "C-RELEASES",
+  "operation_id": "release-note-v42",
+  "content": "Release v42 shipped to production.",
+  "completion_rule": "At most one Slack message per (channel, operation_id). After a dispatched write whose acknowledgement was lost, do not retry that operation_id; if presence cannot be confirmed the outcome is unknown, not complete. After a never-dispatched attempt (adapter-visible), send once. A new operation_id with identical text is legitimate work and must be sent.",
+  "cases": {
+    "original_blind_retry_committed": {
+      "policy": "blind_retry",
+      "fault": "commit_drop_ack",
+      "query": null,
+      "named_assertion": "no_duplicate_for_operation",
+      "required_result_class": "intended_assertion_failed",
+      "required_application_outcome": "incomplete",
+      "notes": "Original bug: lost ack after dispatch, blind retry duplicates."
+    },
+    "blanket_stop_never_dispatched": {
+      "policy": "blanket_stop",
+      "fault": "block_before_dispatch",
+      "query": null,
+      "named_assertion": "completes_missing_work",
+      "required_result_class": "intended_assertion_failed",
+      "required_application_outcome": "incomplete",
+      "notes": "Refusing after a never-dispatched attempt leaves required work unsent."
+    },
+    "incomplete_search_then_retry_degraded": {
+      "policy": "search_then_retry",
+      "fault": "commit_drop_ack",
+      "query": "truncated_empty",
+      "named_assertion": "no_duplicate_for_operation",
+      "required_result_class": "intended_assertion_failed",
+      "required_application_outcome": "incomplete",
+      "notes": "Empty first page with has_more is unknown, not absence."
+    },
+    "correct_committed": {
+      "policy": "reconcile",
+      "fault": "commit_drop_ack",
+      "query": "complete",
+      "named_assertion": "committed_resolved_once",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "complete"
+    },
+    "correct_never_dispatched": {
+      "policy": "reconcile",
+      "fault": "block_before_dispatch",
+      "query": null,
+      "named_assertion": "completes_missing_work",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "complete"
+    },
+    "correct_legitimate_new_op": {
+      "policy": "reconcile",
+      "fault": null,
+      "query": null,
+      "operation_id": "release-note-v42-followup",
+      "named_assertion": "legitimate_second_op_allowed",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "complete"
+    },
+    "correct_unknown_degraded_committed": {
+      "policy": "reconcile",
+      "fault": "commit_drop_ack",
+      "query": "truncated_empty",
+      "named_assertion": "unknown_after_ambiguous_dispatch",
+      "required_result_class": "intended_assertion_passed",
+      "required_application_outcome": "unknown"
+    }
+  }
+}

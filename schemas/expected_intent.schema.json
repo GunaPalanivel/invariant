@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/expected_intent.json",
+  "title": "ExpectedIntent",
+  "description": "Independently authored scoring key. Written before generation. Hidden from interpreter, judge, and generator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "family",
+    "destination",
+    "operation_id",
+    "content",
+    "completion_rule",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "family": { "type": "string" },
+    "destination": { "type": "string" },
+    "operation_id": { "type": "string" },
+    "content": { "type": "string" },
+    "completion_rule": { "type": "string" },
+    "cases": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "named_assertion",
+          "required_result_class",
+          "required_application_outcome"
+        ],
+        "properties": {
+          "policy": { "type": "string" },
+          "fault": { "type": "string" },
+          "query": { "type": "string" },
+          "named_assertion": { "type": "string" },
+          "required_result_class": {
+            "$ref": "execution_result_class.json"
+          },
+          "required_application_outcome": {
+            "type": "string",
+            "enum": ["complete", "incomplete", "unknown"]
+          },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}

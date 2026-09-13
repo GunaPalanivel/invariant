@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://invariant.local/schemas/read_status.json",
+  "title": "ReadStatus",
+  "description": "Observable evidence of an external write. Empty reads do not license retry of a dispatched operation_id.",
+  "type": "string",
+  "enum": [
+    "confirmed_present",
+    "confirmed_absent_under_contract",
+    "unknown"
+  ]
+}

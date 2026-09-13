@@ -1,0 +1,28 @@
+[project]
+name = "invariant"
+version = "0.1.0"
+description = "Turn a real incident into an application regression."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["python-dotenv>=1.0", "pydantic>=2"]
+
+[project.optional-dependencies]
+model = ["google-genai>=1.0", "groq>=0.11"]
+browser = ["playwright>=1.40"]
+
+[project.scripts]
+invariant-evaluate = "invariant.evaluate:main"
+invariant-access = "invariant.access:main"
+invariant-generate = "invariant.generator:main"
+invariant-workflow = "invariant.workflow:main"
+invariant-connect = "invariant.connect_check:main"
+invariant-compare = "invariant.compare:main"
+invariant-sensitivity = "invariant.sensitivity:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["invariant*", "apps*"]

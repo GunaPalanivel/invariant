@@ -1,0 +1,26 @@
+{
+  "incident_id": "inc-holdout-changelog",
+  "linear_issue_id": "INV-22",
+  "authorized_repo": "local/apps/notifier",
+  "slack_channel_id": "C-HOLDOUT",
+  "slack_thread_ts": "1726201000.000100",
+  "sources": {
+    "slack_thread": [
+      {
+        "ts": "1726201000.000100",
+        "user": "U-ONCALL",
+        "text": "Holdout incident. Channel C-HOLDOUT. operation_id changelog-2026-09-13. Intended text: \"Changelog published for 2026-09-13.\" The notifier's post returned an error; we do not know if Slack has the message. Do not invent extra destinations."
+      }
+    ],
+    "linear_issue": {
+      "id": "INV-22",
+      "title": "Changelog announcement exactly once",
+      "description": "Post to C-HOLDOUT with operation_id changelog-2026-09-13 and body 'Changelog published for 2026-09-13.' Incomplete pagination must not cause a second send of that operation_id."
+    },
+    "github_code": {
+      "path": "apps/notifier/notifier.py",
+      "excerpt": "ReleaseNotifier.announce"
+    }
+  },
+  "fault_label": "injected at the test transport. Not a live provider outage."
+}
