@@ -38,7 +38,7 @@ Live objects (reread): Slack incident `1789306404.361089` and finding `178930669
 
 ## Comparison and usefulness
 
-The weak response-only control is labeled weak; it is not a coding agent. Interpret can use a live Gemini/Groq contract. After two $0 repairs, Groq supplied a scenario spec that a deterministic compiler rendered (`scenario-compiler:model:groq`). That is not free-form model-authored unittest. Capable-agent compare remains a labeled single attempt. Minutes to reviewer-accepted regression remain the operator's merge clock on PR 1. No superiority claim.
+The weak response-only control is labeled weak; it is not a coding agent. Interpret can use a live Gemini/Groq contract. After two $0 repairs, Groq supplied a scenario spec that a deterministic compiler rendered (`scenario-compiler:model:groq`). That is not free-form model-authored unittest. The unguided Groq coding-agent blob failed construction and still omitted the required regression names after those repairs. Recorded live workflow wall time was **72 seconds** from Slack intake to mergeable PR 1 (`results/workflow.json`); the remaining clock is the operator's merge click. No superiority claim.
 
 Holdout `ExpectedIntent` lives in `cases/holdout/` and was not supplied to the generator.
 

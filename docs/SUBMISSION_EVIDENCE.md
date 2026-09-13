@@ -23,12 +23,12 @@ Measured 2026-09-13. Injected AUT transport is labeled throughout. Not a live Sl
 ## Local evaluation (injected faults)
 
 - Pack valid only with matrix + independent checker (`results/evaluate.json` `pack.matrix_ok` and `pack.checker_ok`)
-- 62 local tests including `tests/test_review_probes.py`
+- 64 local tests including eight review probes in `tests/test_review_probes.py`
 - Unknown not painted complete
 - Holdout required outcomes met ([`results/comparison.json`](../results/comparison.json))
 - Weak control: labeled weak; false-accepts the original duplicate
-- Capable agent: **ran** (`model:groq`); `valid_python: false` (syntax error); incomplete-repair mentioned; no separate PR. Groq second baseline: valid python, did **not** mention incomplete repair. `superiority_claim: false`
-- Reviewer clock: PR open; merge/accept still the operator of `invariant-validation`; author review, not customer validation
+- Groq coding-agent baseline: recovered blob from `ef1a232` failed construction (`make_session()` tuple vs `.adapter`); two $0 repairs still omitted the four required regression names. Not a mergeable suite. Invariant pack is `valid` with those names present.
+- Operator clock: recorded live workflow **72 seconds** (15:16:00–15:17:12 UTC in `results/workflow.json`) from Slack intake to mergeable PR 1. Local pack **1.13s**. Human merge remains the reviewer's click.
 
 ## Input-sensitivity
 

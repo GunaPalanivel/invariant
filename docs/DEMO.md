@@ -16,6 +16,6 @@ Live objects:
 | 15–35s | Incident + Linear acceptance → grounded contract with source spans | Fields come from sources; invented values are ungrounded |
 | 35–75s | Same generated file, hash `0154894c…`: original RED, incomplete empty-page RED, correct GREEN, shared-session new op GREEN | The regression rejects the bug and the incomplete fix without blocking legitimate work |
 | 75–100s | PR 1, `execution-manifest.json`, Slack reply, Linear comment | Three-app evidence; CI binds an observed blob hash |
-| 100–120s | Scope: injected notifier family; `scenario-compiler:model:groq`; `superiority_claim: false`; remaining: your review, this video, PR merge | Honest limits |
+| 100–120s | Scope: injected notifier family; Groq blob failed construction / missing regression names; remaining: your review, this video, PR merge | Honest limits |
 
 Backup: this document plus `results/workflow.json` and `docs/GENERATION_DIAGNOSIS.md` if a service is blocked.

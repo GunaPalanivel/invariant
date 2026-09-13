@@ -68,4 +68,4 @@ Slack no longer retries on HTTP 500 after a committed write. Linear reread requi
 - Independent engineer review of PR 1 is still yours; not recorded here.
 - Two-minute video is still yours; add the link to the README when it exists.
 - PR 1 merge clock remains the operator of `invariant-validation`. Do not auto-merge.
-- `superiority_claim` is false.
+- Groq coding-agent baseline is a finding (construction failure, then omitted required regression names), not an unfinished comparison.
