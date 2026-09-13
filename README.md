@@ -34,15 +34,15 @@ The supported application is `apps/notifier`. This version uses its local source
 
 ### Implementation map
 
-| Path                                               | Responsibility                                            |
-| -------------------------------------------------- | --------------------------------------------------------- |
-| `apps/notifier/`                                   | Reference application and recovery policies               |
-| `invariant/interpret.py`                           | Contract extraction and grounding checks                  |
-| `invariant/generator.py`                           | Model candidate generation and template fallback          |
-| `invariant/harness.py`, `observer.py`, `runner.py` | Fault injection, observed state and predefined evaluation |
-| `invariant/candidate_runner.py` | Isolated subprocess matrix for the generated file |
+| Path                                               | Responsibility                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------- |
+| `apps/notifier/`                                   | Reference application and recovery policies                     |
+| `invariant/interpret.py`                           | Contract extraction and grounding checks                        |
+| `invariant/generator.py`                           | Model candidate generation and template fallback                |
+| `invariant/harness.py`, `observer.py`, `runner.py` | Fault injection, observed state and predefined evaluation       |
+| `invariant/candidate_runner.py`                    | Isolated subprocess matrix for the generated file               |
 | `invariant/live_publish.py`, `github_publish.py`   | External publication, pending/unknown journal, observed CI hash |
-| `console/`                                         | Recorded-run list and detail view                         |
+| `console/`                                         | Recorded-run list and detail view                               |
 
 ## 02 External apps used
 
@@ -125,14 +125,14 @@ The [adapter guide](docs/LIVE_APPS.md) lists service permissions and destination
 
 We inject faults at the notifier's transport boundary and inspect resulting message state. The notifier receives ordinary send/read results; the observer records destination, operation identity, content and effect count.
 
-| Controlled case                                 | Behavior checked                             |
-| ----------------------------------------------- | -------------------------------------------- |
-| Write commits, acknowledgement is lost          | Blind retry produces a duplicate             |
-| Request is blocked before dispatch              | Blanket stopping leaves required work unsent |
-| Write commits, next read is truncated and empty | Search-then-retry produces a duplicate       |
-| Existing write is confirmed present             | Reconciliation avoids a second send          |
-| Dispatch is known not to have happened          | Recovery completes the intended write        |
-| Dispatch happened, evidence remains incomplete  | Recovery reports unknown without resending   |
+| Controlled case                                 | Behavior checked                                      |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| Write commits, acknowledgement is lost          | Blind retry produces a duplicate                      |
+| Request is blocked before dispatch              | Blanket stopping leaves required work unsent          |
+| Write commits, next read is truncated and empty | Search-then-retry produces a duplicate                |
+| Existing write is confirmed present             | Reconciliation avoids a second send                   |
+| Dispatch is known not to have happened          | Recovery completes the intended write                 |
+| Dispatch happened, evidence remains incomplete  | Recovery reports unknown without resending            |
 | Shared session, new `operation_id`, same text   | Correct recovery sends both; content-only dedup fails |
 
 Local suite: **62 tests passed** with live models disabled, including eight desired-state probes for the review findings (`tests/test_review_probes.py`). The predefined checker still reports three intended defect detections and four passing cases. `pack.valid` is true only when that checker **and** the isolated generated-file matrix both hold.
@@ -155,16 +155,14 @@ A green unit suite is not a production-readiness claim. See [GENERATION_DIAGNOSI
 
 The walkthrough should make the completed behavior visible in this order:
 
-| Time            | Evidence to show                                                       |
-| --------------- | ---------------------------------------------------------------------- |
-| 0-15 seconds    | Lost-ack duplicate under original retry                                |
-| 15-35 seconds   | Grounded contract with source spans                                    |
-| 35-75 seconds   | Same generated file: original RED, incomplete RED, correct GREEN, new op |
-| 75-100 seconds  | PR 1, execution manifest, Slack reply, Linear comment                  |
+| Time            | Evidence to show                                                           |
+| --------------- | -------------------------------------------------------------------------- |
+| 0-15 seconds    | Lost-ack duplicate under original retry                                    |
+| 15-35 seconds   | Grounded contract with source spans                                        |
+| 35-75 seconds   | Same generated file: original RED, incomplete RED, correct GREEN, new op   |
+| 75-100 seconds  | PR 1, execution manifest, Slack reply, Linear comment                      |
 | 100-120 seconds | Scenario-compiler provenance, `superiority_claim: false`, remaining limits |
 
 The console is a recorded-run viewer. Label replayed evidence and injected failures.
 
 [Recorded app evidence](docs/SUBMISSION_EVIDENCE.md) · [Recording guide](docs/DEMO.md)
-
-Built by [Guna Palanivel](https://github.com/GunaPalanivel).
