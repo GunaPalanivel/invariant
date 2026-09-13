@@ -18,7 +18,7 @@ query Issue($id: String!) {
     title
     description
     url
-    comments { nodes { id body } }
+    comments(first: 100) { nodes { id body } pageInfo { hasNextPage endCursor } }
   }
 }
 """

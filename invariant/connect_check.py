@@ -204,10 +204,22 @@ def github_connection_check() -> dict:
         pr = github_ad.get_pull(owner, name, int(journal.github_pr_number or 1))
         head_sha = (pr.get("head") or {}).get("sha") or ""
         runs = github_ad.actions_runs_for_sha(owner, name, head_sha or GITHUB_HEAD)
+        observed_hash = ""
+        try:
+            import base64
+
+            from invariant.hashing import sha256_source_bytes
+
+            body = github_ad.get_contents(
+                owner, name, "tests/test_generated_aut.py", ref=head_sha or GITHUB_HEAD
+            )
+            observed_hash = sha256_source_bytes(base64.b64decode(body.get("content") or ""))
+        except github_ad.GitHubError:
+            observed_hash = ""
         bound = github_ad.bind_ci(
             head_sha=head_sha or GITHUB_HEAD,
             aut_revision=journal.github_head_sha or GITHUB_HEAD,
-            blob_hash=test_hash,
+            blob_hash=observed_hash,
             test_hash=test_hash,
         )
         run0 = runs[0] if runs else {}
@@ -223,6 +235,9 @@ def github_connection_check() -> dict:
             "ci_runs": len(runs),
             "ci_url": run0.get("html_url"),
             "ci_status": run0.get("conclusion") or run0.get("status"),
+            "observed_test_hash": observed_hash or None,
+            "expected_test_hash": test_hash,
+            "hash_match": bool(observed_hash) and observed_hash == test_hash,
             "bind_head_sha_matches_aut_revision": bound,
             "second_pr_opened": False,
         }

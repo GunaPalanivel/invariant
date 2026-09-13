@@ -122,3 +122,8 @@ class TestPublicationJournal(unittest.TestCase):
         journal = PublicationJournal(run_id="x", slack_reply_status="unknown")
         with self.assertRaises(PublicationBlocked):
             reconcile_before_write(journal, "slack_reply_status", "slack_reply_ts")
+
+    def test_reconcile_pending(self):
+        journal = PublicationJournal(run_id="y", slack_reply_status="pending")
+        with self.assertRaises(PublicationBlocked):
+            reconcile_before_write(journal, "slack_reply_status", "slack_reply_ts")

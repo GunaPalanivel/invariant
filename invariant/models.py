@@ -156,6 +156,11 @@ class PublicationJournal:
     github_pr_status: str | None = None
     ci_run_id: str | None = None
     ci_bound: bool = False
+    evidence_version: str | None = None
+    slack_operation_id: str | None = None
+    slack_payload_hash: str | None = None
+    linear_payload_hash: str | None = None
+    github_payload_hash: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

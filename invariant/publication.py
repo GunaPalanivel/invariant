@@ -70,9 +70,9 @@ def reconcile_before_write(journal: PublicationJournal, status_field: str, id_fi
     """Return reuse | write | block."""
     status = _status(journal, status_field)
     existing = getattr(journal, id_field)
-    if status == "unknown":
+    if status in {"unknown", "pending"}:
         raise PublicationBlocked(
-            f"{status_field} is unknown; refusing a second write for run {journal.run_id}"
+            f"{status_field} is {status}; refusing a second write for run {journal.run_id}"
         )
     if status == "published" and existing:
         return "reuse"

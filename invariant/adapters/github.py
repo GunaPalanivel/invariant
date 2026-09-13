@@ -187,6 +187,33 @@ def actions_runs_for_sha(owner: str, repo: str, head_sha: str) -> list[dict[str,
     return list(body.get("workflow_runs") or [])
 
 
+def list_run_artifacts(owner: str, repo: str, run_id: str | int) -> list[dict[str, Any]]:
+    body = _request("GET", f"/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts")
+    return list(body.get("artifacts") or [])
+
+
+def download_artifact_zip(owner: str, repo: str, artifact_id: str | int) -> bytes:
+    url = GITHUB_API + f"/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
+    req = urllib.request.Request(url, headers=_headers(), method="GET")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise GitHubError(f"HTTP {exc.code} GET artifact zip: {detail[:800]}") from exc
+
+
+def execution_manifest_from_zip(blob: bytes) -> dict[str, Any]:
+    import io
+    import zipfile
+
+    with zipfile.ZipFile(io.BytesIO(blob)) as archive:
+        names = [name for name in archive.namelist() if name.endswith("execution-manifest.json")]
+        if not names:
+            return {}
+        return json.loads(archive.read(names[0]).decode("utf-8"))
+
+
 def bind_ci(*, head_sha: str, aut_revision: str, blob_hash: str, test_hash: str) -> bool:
     from invariant.verification import ci_may_inherit
 

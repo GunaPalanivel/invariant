@@ -25,10 +25,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run AUT regressions
+      - name: Run AUT regressions and write execution manifest
         env:
           PYTHONPATH: .
-        run: python -m unittest discover -s tests -v
+          INVARIANT_AUT_IMPLEMENTATION: correct
+        run: python scripts/write_execution_manifest.py --run-tests
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: execution-manifest
+          path: execution-manifest.json
 """
 
 VALIDATION_README = """# invariant-validation
@@ -37,6 +43,28 @@ Reference release-notifier and CI for Invariant. This is **not** the product bro
 
 Faults in these tests are **injected at the test transport**. They are not a live Slack outage.
 """
+
+MANIFEST_SCRIPT = '''from __future__ import annotations
+import hashlib, json, os
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
+path = ROOT / "tests" / "test_generated_aut.py"
+raw = path.read_bytes() if path.exists() else b""
+normalized = raw.replace(b"\\r\\n", b"\\n").replace(b"\\r", b"\\n")
+payload = {
+    "workflow": os.environ.get("GITHUB_WORKFLOW") or "ci",
+    "head_sha": os.environ.get("GITHUB_SHA"),
+    "executed_file": "tests/test_generated_aut.py",
+    "blob_hash": hashlib.sha256(normalized).hexdigest(),
+    "bytes": len(normalized),
+    "implementation": os.environ.get("INVARIANT_AUT_IMPLEMENTATION"),
+    "tests_run": None,
+    "errors": [],
+    "failures": [],
+}
+(ROOT / "execution-manifest.json").write_text(json.dumps(payload, indent=2) + "\\n", encoding="utf-8")
+print(payload["blob_hash"])
+'''
 
 
 def _run(args: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -118,6 +146,13 @@ def write_testkit_files(clone: Path) -> None:
     wf = clone / ".github" / "workflows"
     wf.mkdir(parents=True, exist_ok=True)
     (wf / "ci.yml").write_text(CI_YAML, encoding="utf-8")
+    scripts = clone / "scripts"
+    scripts.mkdir(parents=True, exist_ok=True)
+    src_script = ROOT / "scripts" / "write_execution_manifest.py"
+    if src_script.exists():
+        (scripts / "write_execution_manifest.py").write_text(src_script.read_text(encoding="utf-8"), encoding="utf-8")
+    else:
+        (scripts / "write_execution_manifest.py").write_text(MANIFEST_SCRIPT, encoding="utf-8")
     (clone / ".gitignore").write_text("__pycache__/\n*.pyc\n.venv/\n.env\n", encoding="utf-8")
 
 
@@ -178,18 +213,27 @@ def publish_regression_pr(
     if journal.github_pr_number:
         pr = github.get_pull(owner, name, int(journal.github_pr_number))
     else:
-        pulls = github.list_pulls(owner, name, head=f"{owner}:{branch}")
-        if pulls:
-            pr = pulls[0]
-        else:
-            pr = github.create_pull(
-                owner,
-                name,
-                title="Invariant AUT regression: lost-ack write family",
-                head=branch,
-                base="main",
-                body=summary,
-            )
+        journal.github_branch = branch
+        journal.github_payload_hash = test_hash
+        journal.github_pr_status = "pending"
+        save_journal(journal)
+        try:
+            pulls = github.list_pulls(owner, name, head=f"{owner}:{branch}")
+            if pulls:
+                pr = pulls[0]
+            else:
+                pr = github.create_pull(
+                    owner,
+                    name,
+                    title="Invariant AUT regression: lost-ack write family",
+                    head=branch,
+                    base="main",
+                    body=summary,
+                )
+        except Exception:
+            journal.github_pr_status = "unknown"
+            save_journal(journal)
+            raise
     number = int(pr["number"])
     journal.github_branch = branch
     journal.github_pr_number = number
@@ -198,6 +242,35 @@ def publish_regression_pr(
     journal.ci_bound = False
     save_journal(journal)
     return load_journal(run_id)
+
+
+def _observed_blob_hash(owner: str, name: str, head: str, relpath: str = "tests/test_generated_aut.py") -> str:
+    import base64
+
+    from invariant.hashing import sha256_source_bytes
+
+    body = github.get_contents(owner, name, relpath, ref=head)
+    encoded = body.get("content") or ""
+    raw = base64.b64decode(encoded)
+    return sha256_source_bytes(raw)
+
+
+def _artifact_blob_hash(owner: str, name: str, run_id: str | int) -> str | None:
+    try:
+        artifacts = github.list_run_artifacts(owner, name, run_id)
+    except Exception:
+        return None
+    for item in artifacts:
+        if (item.get("name") or "") != "execution-manifest":
+            continue
+        try:
+            blob = github.download_artifact_zip(owner, name, item["id"])
+            payload = github.execution_manifest_from_zip(blob)
+        except Exception:
+            return None
+        hashed = payload.get("blob_hash")
+        return str(hashed) if hashed else None
+    return None
 
 
 def wait_and_bind_ci(journal: PublicationJournal, test_hash: str, timeout_s: int = 180) -> PublicationJournal:
@@ -213,13 +286,28 @@ def wait_and_bind_ci(journal: PublicationJournal, test_hash: str, timeout_s: int
     bound = False
     ci_id = None
     html = None
+    associated = False
+    completed = False
+    conclusion = None
+    observed_hash = None
+    artifact_hash = None
+    hash_match = False
+    artifact_match = False
+    remote_reads = 0
+    try:
+        observed_hash = _observed_blob_hash(owner, name, head)
+        remote_reads = 1
+        hash_match = observed_hash == test_hash
+    except Exception:
+        observed_hash = None
+        hash_match = False
     for run in last_runs:
-        if github.bind_ci(
-            head_sha=run.get("head_sha") or "",
-            aut_revision=head,
-            blob_hash=test_hash,
-            test_hash=test_hash,
-        ):
+        associated = (run.get("head_sha") or "") == head
+        completed = (run.get("status") or "") == "completed"
+        conclusion = run.get("conclusion")
+        artifact_hash = _artifact_blob_hash(owner, name, run.get("id"))
+        artifact_match = artifact_hash is None or artifact_hash == test_hash
+        if associated and completed and hash_match and artifact_match and conclusion == "success":
             bound = True
             ci_id = str(run.get("id"))
             html = run.get("html_url")
@@ -228,11 +316,26 @@ def wait_and_bind_ci(journal: PublicationJournal, test_hash: str, timeout_s: int
     journal.ci_run_id = ci_id
     save_journal(journal)
     journal = load_journal(journal.run_id)
-    # stash URL on a sidecar file, not in schema
     sidecar = ROOT / "runs" / journal.run_id / "github_ci.json"
+    sidecar.parent.mkdir(parents=True, exist_ok=True)
     sidecar.write_text(
         __import__("json").dumps(
-            {"bound": bound, "ci_run_id": ci_id, "html_url": html, "head_sha": head, "runs_seen": len(last_runs)},
+            {
+                "bound": bound,
+                "ci_run_id": ci_id,
+                "html_url": html,
+                "head_sha": head,
+                "runs_seen": len(last_runs),
+                "sha_associated": associated,
+                "completed": completed,
+                "conclusion": conclusion,
+                "observed_test_hash": observed_hash,
+                "artifact_blob_hash": artifact_hash,
+                "expected_test_hash": test_hash,
+                "hash_match": hash_match,
+                "artifact_match": artifact_match,
+                "remote_blob_reads": remote_reads,
+            },
             indent=2,
         )
         + "\n",

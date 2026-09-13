@@ -9,6 +9,7 @@ from invariant.adapters import github as github_ad
 from invariant.adapters import linear as linear_ad
 from invariant.adapters import slack as slack_ad
 from invariant.evaluate import build_console_run, detections, pack_valid, run_expected_cases, write_console_runs
+from invariant.candidate_runner import evaluate_candidate_matrix
 from invariant.generator import write_generated_tests, write_weak_control
 from invariant.github_publish import (
     ensure_clone,
@@ -114,13 +115,16 @@ def run_workflow() -> dict:
         workflow_id="wf-release-v42",
         run_attempt=1,
     )
-    pack = pack_valid(executions)
+    matrix = evaluate_candidate_matrix(gen.text, persist_manifest=True)
+    pack = pack_valid(executions, matrix=matrix.to_dict())
     summary = (
         "Invariant finding (injected transport, not a live Slack outage): "
         "original duplicate and incomplete empty-page retry rejected; "
         "correct recovery preserves unknown after lost ack."
+        f"\nevidence_version={test_hash}"
     )
     journal = strip_fixture_slack_linear(load_journal(RUN_ID))
+    journal.evidence_version = test_hash
     ids = slack_ad.destination_ids()
     if ids.get("channel_id"):
         journal.slack_channel_id = ids["channel_id"]
@@ -133,7 +137,15 @@ def run_workflow() -> dict:
     ci_url = None
     github_error = None
     aut_revision = ""
-    if github_ad.configured():
+    slack_evidence: dict = {"url": None, "status": "deferred"}
+    linear_evidence: dict = {"url": None, "status": "deferred"}
+    if not pack["valid"]:
+        journal.github_pr_status = "blocked"
+        journal.slack_reply_status = "blocked"
+        journal.linear_comment_status = "blocked"
+        save_journal(journal)
+        github_error = "publication blocked: pack.valid is false"
+    elif github_ad.configured():
         owner, name = github_ad.split_repo()
         ensure_remote_repo(owner, name)
         ensure_clone(owner, name)
@@ -154,9 +166,7 @@ def run_workflow() -> dict:
     else:
         github_error = "GITHUB_TOKEN / gh auth missing"
 
-    slack_evidence: dict = {"url": None, "status": "deferred"}
-    linear_evidence: dict = {"url": None, "status": "deferred"}
-    if slack_ad.configured():
+    if pack["valid"] and slack_ad.configured():
         journal, slack_evidence = publish_slack_finding(
             journal,
             channel=ids.get("channel_id") or "",
@@ -164,7 +174,7 @@ def run_workflow() -> dict:
             text=summary,
             operation_id=contract.operation_id,
         )
-    if linear_ad.configured():
+    if pack["valid"] and linear_ad.configured():
         journal, linear_evidence = publish_linear_comment(
             journal,
             issue_id=linear_ad.issue_id() or "",
@@ -232,6 +242,7 @@ def run_workflow() -> dict:
         "generated_test_hash": test_hash,
         "model_usage": usage,
         "pack": pack,
+        "matrix": matrix.to_dict(),
         "detections": detections(executions),
         "journal": journal.to_dict(),
         "slack_evidence": slack_evidence,

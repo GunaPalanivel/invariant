@@ -13,22 +13,27 @@
     "slack_reply_ts": { "type": ["string", "null"] },
     "slack_reply_status": {
       "type": ["string", "null"],
-      "enum": ["pending", "published", "failed", "unknown", null]
+      "enum": ["pending", "published", "failed", "unknown", "blocked", "deferred", null]
     },
     "linear_issue_id": { "type": ["string", "null"] },
     "linear_comment_id": { "type": ["string", "null"] },
     "linear_comment_status": {
       "type": ["string", "null"],
-      "enum": ["pending", "published", "failed", "unknown", null]
+      "enum": ["pending", "published", "failed", "unknown", "blocked", "deferred", null]
     },
     "github_branch": { "type": ["string", "null"] },
     "github_pr_number": { "type": ["integer", "null"] },
     "github_head_sha": { "type": ["string", "null"] },
     "github_pr_status": {
       "type": ["string", "null"],
-      "enum": ["pending", "published", "failed", "unknown", null]
+      "enum": ["pending", "published", "failed", "unknown", "blocked", "deferred", null]
     },
     "ci_run_id": { "type": ["string", "null"] },
-    "ci_bound": { "type": "boolean" }
+    "ci_bound": { "type": "boolean" },
+    "evidence_version": { "type": ["string", "null"] },
+    "slack_operation_id": { "type": ["string", "null"] },
+    "slack_payload_hash": { "type": ["string", "null"] },
+    "linear_payload_hash": { "type": ["string", "null"] },
+    "github_payload_hash": { "type": ["string", "null"] }
   }
 }
