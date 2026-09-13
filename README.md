@@ -8,7 +8,7 @@ Invariant connects Slack, Linear and GitHub to investigate ambiguous delivery an
 
 [Inspect the test PR](https://github.com/GunaPalanivel/invariant-validation/pull/1) | [Recorded evidence](docs/SUBMISSION_EVIDENCE.md) | [Run locally](#03-setup-instructions) | [Reliability testing](#04-reliability-testing) | [Demo](#05-demo-video)
 
-**Demo video:** Pending recording. The [recording guide](docs/DEMO.md) describes the two-minute walkthrough.
+**Demo video:** [Multi_App_Hackathon_Strategy.mp4](https://drive.google.com/file/d/1tb08gPVp2HEMIAyEtVWJgQBj0cxEJO9x/view?usp=sharing). The [recording guide](docs/DEMO.md) describes the two-minute walkthrough.
 
 **Current build:** live model-assisted interpretation, a Groq scenario spec compiled into the generated suite, isolated original/incomplete/correct/mutant execution, and recorded publications in all three apps. Failure reproduction uses injected transport. Details: [`docs/GENERATION_DIAGNOSIS.md`](docs/GENERATION_DIAGNOSIS.md).
 
@@ -151,7 +151,7 @@ A green unit suite is not a production-readiness claim. See [GENERATION_DIAGNOSI
 
 ## 05 Demo video
 
-**Video link:** Pending recording. Add the accessible final URL here before submission; maximum duration is two minutes.
+**Video link:** [Multi_App_Hackathon_Strategy.mp4](https://drive.google.com/file/d/1tb08gPVp2HEMIAyEtVWJgQBj0cxEJO9x/view?usp=sharing)
 
 The walkthrough should make the completed behavior visible in this order:
 
