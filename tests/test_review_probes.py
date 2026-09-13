@@ -105,6 +105,28 @@ class TestReviewFindings(unittest.TestCase):
         self.assertTrue(get_contents.call_count >= 1)
         self.assertFalse(result.ci_bound)
 
+    def test_ci_yaml_invokes_matrix_script(self):
+        self.assertIn("scripts/run_candidate_matrix.py", gp.CI_YAML)
+        self.assertIn("candidate_runner.py", "\n".join(
+            __import__("invariant.validation_seed", fromlist=["PRODUCT_WHITELIST"]).PRODUCT_WHITELIST
+        ))
+
+    def test_matrix_script_fails_when_required_outcomes_are_wrong(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as tmp:
+            noop = Path(tmp) / "noop.py"
+            noop.write_text(NOOP, encoding="utf-8")
+            proc = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "run_candidate_matrix.py")],
+                cwd=ROOT,
+                env={**os.environ, "INVARIANT_CANDIDATE_PATH": str(noop), "INVARIANT_USE_LIVE_MODEL": "0"},
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+        self.assertNotEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+
     def test_f5_slack_does_not_retry_ambiguous_error(self):
         effects = []
 

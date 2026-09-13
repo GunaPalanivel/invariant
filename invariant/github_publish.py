@@ -25,11 +25,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run AUT regressions and write execution manifest
+      - name: Run isolated candidate matrix
+        env:
+          PYTHONPATH: .
+        run: python scripts/run_candidate_matrix.py
+      - name: Run AUT regressions under correct overlay
         env:
           PYTHONPATH: .
           INVARIANT_AUT_IMPLEMENTATION: correct
-        run: python scripts/write_execution_manifest.py --run-tests
+        run: python -m unittest discover -s tests -v
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -153,6 +157,9 @@ def write_testkit_files(clone: Path) -> None:
         (scripts / "write_execution_manifest.py").write_text(src_script.read_text(encoding="utf-8"), encoding="utf-8")
     else:
         (scripts / "write_execution_manifest.py").write_text(MANIFEST_SCRIPT, encoding="utf-8")
+    matrix_script = ROOT / "scripts" / "run_candidate_matrix.py"
+    if matrix_script.exists():
+        (scripts / "run_candidate_matrix.py").write_text(matrix_script.read_text(encoding="utf-8"), encoding="utf-8")
     (clone / ".gitignore").write_text("__pycache__/\n*.pyc\n.venv/\n.env\n", encoding="utf-8")
 
 
@@ -268,7 +275,7 @@ def _artifact_blob_hash(owner: str, name: str, run_id: str | int) -> str | None:
             payload = github.execution_manifest_from_zip(blob)
         except Exception:
             return None
-        hashed = payload.get("blob_hash")
+        hashed = payload.get("blob_hash") or payload.get("candidate_hash")
         return str(hashed) if hashed else None
     return None
 

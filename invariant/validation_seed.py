@@ -20,6 +20,7 @@ PRODUCT_WHITELIST = [
     "invariant/harness.py",
     "invariant/assertions.py",
     "invariant/verification.py",
+    "invariant/candidate_runner.py",
 ]
 
 BROKER_MUST_NOT_APPEAR = (
