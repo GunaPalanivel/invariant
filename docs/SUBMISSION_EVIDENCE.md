@@ -5,21 +5,25 @@ Measured 2026-09-13. Injected AUT transport is labeled throughout. Not a live Sl
 ## Product / AUT commits
 
 - Product repo: https://github.com/GunaPalanivel/invariant
-- Validation repo `GunaPalanivel/invariant-validation` head used for bind: `c74ea2d90c11765304e03787b294c4a76fa510e8` (PR #1 reused; journal GET, no second PR).
-- Generated test blob SHA-256: `63e8a8be2f9c91013b1044a1af681c6ab4b2a273edc388092859a4ac88ddb66c`
+- Validation repo `GunaPalanivel/invariant-validation` PR #1 reused; journal GET, no second PR. Head after this repair will be the SHA pushed with the new generated blob.
+- Generated test blob SHA-256: `0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19`
+- AUT content hash: `4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39`
 - AUT destination in generated tests: `C-RELEASES` (incident text). Intake Slack snowflake `C0C1H02UHEW` is not the AUT destination.
 
 ## Model run
 
 - Primary: `gemini-3.7-flash` (`GEMINI_API_KEY`). Fallback: Groq `openai/gpt-oss-120b`.
 - `interpret_origin`: `model:groq+gemini` (live JSON contract; Pydantic-validated).
-- `generation_origin`: `disclosed_template`
-- `generation_reason`: model blob failed AUT execution (`generated tests errored or failed on the AUT`); template used. Not labeled as model-authored tests.
+- `generation_origin` (live generate): `scenario-compiler:model:groq`
+- `code_generation_origin`: `deterministic_compiler`
+- Local evaluate with live model off records `disclosed_template` / `no live model` in `results/evaluate.json`
+- Matrix: original and incomplete fail required cases; correct passes; content-dedup mutant fails new-op. See [`results/execution-manifest.json`](../results/execution-manifest.json) and [`docs/GENERATION_DIAGNOSIS.md`](GENERATION_DIAGNOSIS.md).
 - Token usage (interpret): input 1725, output 811. Raw: [`results/m3-model.json`](../results/m3-model.json), [`results/hostile-live.json`](../results/hostile-live.json), [`results/sensitivity.json`](../results/sensitivity.json)
 
 ## Local evaluation (injected faults)
 
-- Pack valid: 4 `intended_assertion_passed`, 3 `intended_assertion_failed`, 0 `invalid_test`
+- Pack valid only with matrix + independent checker (`results/evaluate.json` `pack.matrix_ok` and `pack.checker_ok`)
+- 62 local tests including `tests/test_review_probes.py`
 - Unknown not painted complete
 - Holdout required outcomes met ([`results/comparison.json`](../results/comparison.json))
 - Weak control: labeled weak; false-accepts the original duplicate

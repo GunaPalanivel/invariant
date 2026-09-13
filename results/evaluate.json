@@ -6,10 +6,10 @@
   "generation_origin": "disclosed_template",
   "generation_reason": "no live model",
   "model_usage": {},
-  "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-  "generated_test_path": "None",
-  "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
-  "handwritten_test_hash": "08d84ba25f2111bf580057063b9c3dbb61def59f9dfeb93d581211357705996c",
+  "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+  "generated_test_path": "generated/test_generated_aut.py",
+  "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
+  "handwritten_test_hash": "dc45e3657e70741b9a46e76717396fdb721e6de43efbfa09a36d28d596011b7e",
   "detections": {
     "intended_assertion_passed": 4,
     "intended_assertion_failed": 3,
@@ -19,10 +19,70 @@
   },
   "pack": {
     "valid": true,
+    "checker_ok": true,
+    "matrix_ok": true,
     "required_findings_caught": true,
     "required_passes_ok": true,
     "unknown_not_painted_complete": true,
-    "matches_expected_intent": true
+    "matches_expected_intent": true,
+    "checker_role": "independent"
+  },
+  "matrix": {
+    "candidate_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
+    "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+    "ok": true,
+    "reason": "matrix holds",
+    "invalid_test": false,
+    "construction_error": false,
+    "runs": [
+      {
+        "implementation": "original",
+        "exit_code": 1,
+        "tests_run": 4,
+        "failures": [
+          "test_candidate.GeneratedAutRegression.test_empty_page_after_dispatch_does_not_retry",
+          "test_candidate.GeneratedAutRegression.test_lost_ack_does_not_duplicate"
+        ],
+        "errors": [],
+        "ok_for_impl": true,
+        "reason": "ok",
+        "classification": "ok"
+      },
+      {
+        "implementation": "incomplete",
+        "exit_code": 1,
+        "tests_run": 4,
+        "failures": [
+          "test_candidate.GeneratedAutRegression.test_empty_page_after_dispatch_does_not_retry"
+        ],
+        "errors": [],
+        "ok_for_impl": true,
+        "reason": "ok",
+        "classification": "ok"
+      },
+      {
+        "implementation": "correct",
+        "exit_code": 0,
+        "tests_run": 4,
+        "failures": [],
+        "errors": [],
+        "ok_for_impl": true,
+        "reason": "ok",
+        "classification": "ok"
+      },
+      {
+        "implementation": "content_dedup",
+        "exit_code": 1,
+        "tests_run": 4,
+        "failures": [
+          "test_candidate.GeneratedAutRegression.test_legitimate_new_operation_same_text"
+        ],
+        "errors": [],
+        "ok_for_impl": true,
+        "reason": "ok",
+        "classification": "ok"
+      }
+    ]
   },
   "cases": [
     {
@@ -52,8 +112,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_failed",
           "application_outcome": "incomplete"
@@ -92,8 +152,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_failed",
           "application_outcome": "incomplete"
@@ -132,8 +192,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_failed",
           "application_outcome": "incomplete"
@@ -172,8 +232,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
           "application_outcome": "complete"
@@ -212,8 +272,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
           "application_outcome": "complete"
@@ -231,8 +291,8 @@
       "assertion": {
         "named_assertion": "legitimate_second_op_allowed",
         "passed": true,
-        "expected": "new operation_id with identical text is sent once",
-        "observed": "message_count=1 complete=True",
+        "expected": "shared session: one effect per operation_id and two total for the same text",
+        "observed": "new_count=1 total_for_content=2 complete=True",
         "violated_invariant": "",
         "next_action": "none",
         "result_class": "intended_assertion_passed",
@@ -252,11 +312,12 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
-          "application_outcome": "complete"
+          "application_outcome": "complete",
+          "prior_operation_id": "release-note-v42"
         },
         "result_class": "intended_assertion_passed",
         "named_assertion": "legitimate_second_op_allowed",
@@ -292,8 +353,8 @@
       "verification": {
         "workflow_id": "wf-release-v42",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
           "application_outcome": "unknown"
@@ -334,8 +395,8 @@
       "verification": {
         "workflow_id": "wf-holdout-changelog",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_failed",
           "application_outcome": "incomplete"
@@ -374,8 +435,8 @@
       "verification": {
         "workflow_id": "wf-holdout-changelog",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_failed",
           "application_outcome": "incomplete"
@@ -414,8 +475,8 @@
       "verification": {
         "workflow_id": "wf-holdout-changelog",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
           "application_outcome": "unknown"
@@ -454,8 +515,8 @@
       "verification": {
         "workflow_id": "wf-holdout-changelog",
         "run_attempt": 1,
-        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
-        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+        "generated_test_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
         "required_outcomes": {
           "result_class": "intended_assertion_passed",
           "application_outcome": "complete"

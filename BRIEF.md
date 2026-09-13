@@ -15,8 +15,10 @@ Ambiguous external write, acknowledgement lost. Injected as: write forwarded the
 - **Observer** records destination, `operation_id`, content, and counts independently.
 - **Detection** is only `intended_assertion_failed` on the named assertion. Import errors are `invalid_test`. Timeouts are `infrastructure_failure`.
 - **VerificationRecord** binds `workflow_id`, `run_attempt`, executed `aut_revision`, test hash, and required outcomes. Another SHA or blob does not inherit PASS/FAIL.
-- **PublicationJournal** GETs stored IDs before writes. If a prior write is unknown, Invariant does not create a second PR, comment, or reply.
-- Production tokens stay in the broker. Generated tests do not receive them.
+- **PublicationJournal** writes a pending intent before send. Ambiguous dispatch (timeout, HTTP 500) persists `unknown`. Restart does not create a second Slack reply, Linear comment, or GitHub PR.
+- Generated tests run in an isolated subprocess with an environment allowlist. Broker tokens and a synthetic canary are not visible to the candidate.
+- `pack.valid` requires the generated file's isolated matrix (original / incomplete / correct / content-dedup mutant) **and** the independent ExpectedIntent checker. The checker cannot alone make the pack valid.
+- CI binding reads the test file at `head_sha` and compares that observed hash. A failed or unmatched job is not a verified execution.
 
 ## Read status
 
@@ -30,13 +32,13 @@ Ambiguous external write, acknowledgement lost. Injected as: write forwarded the
 
 1. Slack thread intake and reply (`chat.postMessage` + `thread_ts`; paginated `conversations.history` / `conversations.replies`).
 2. Linear `commentCreate` on GUN-5; description is not overwritten.
-3. GitHub PR 1 on `GunaPalanivel/invariant-validation`; Actions attached only when `head_sha` equals `aut_revision` and the executed blob hash equals the test hash.
+3. GitHub PR 1 on `GunaPalanivel/invariant-validation`; Actions attached only when `head_sha` equals the published revision, the observed test blob hash matches, and the job completed successfully.
 
 Live objects (reread): Slack incident `1789306404.361089` and finding `1789306699.812559`; Linear comment `d94a2b69-a255-4f44-a3a8-7f94f72d9dca`; GitHub PR 1 / Actions `34760856153`. Journal: `runs/run-release-v42/journal.json`.
 
 ## Comparison and usefulness
 
-The weak response-only control is labeled weak; it is not a coding agent. Interpret used a live Gemini/Groq contract (`model:groq+gemini`). Generated tests are `disclosed_template` after the live model blob failed AUT execution. A capable-agent attempt **ran** on Groq: the blob was not valid Python. A Groq second baseline produced valid Python that did not mention the incomplete-repair case. Minutes to reviewer-accepted regression remain the operator's merge clock on PR 1. No superiority claim.
+The weak response-only control is labeled weak; it is not a coding agent. Interpret can use a live Gemini/Groq contract. After two $0 repairs, Groq supplied a scenario spec that a deterministic compiler rendered (`scenario-compiler:model:groq`). That is not free-form model-authored unittest. Capable-agent compare remains a labeled single attempt. Minutes to reviewer-accepted regression remain the operator's merge clock on PR 1. No superiority claim.
 
 Holdout `ExpectedIntent` lives in `cases/holdout/` and was not supplied to the generator.
 

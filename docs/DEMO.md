@@ -1,6 +1,6 @@
 # Demo recording (from this tree)
 
-You record the two-minute video. The console is frozen evidence from off-camera runs. Injected AUT faults stay labeled. Slack/Linear/GitHub links on Publish are live object URLs from reread.
+You record the two-minute video. Add the public URL to the README when it exists. The console is frozen evidence from off-camera runs. Injected AUT faults stay labeled. Slack/Linear/GitHub links on Publish are live object URLs from reread.
 
 Live objects:
 
@@ -10,13 +10,12 @@ Live objects:
 - PR: https://github.com/GunaPalanivel/invariant-validation/pull/1
 - CI: https://github.com/GunaPalanivel/invariant-validation/actions/runs/34765110314
 
-| Time     | Show                                                                                                   | Takeaway                                                        |
-| -------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| 0–15s    | Runs list: `run-release-v42` plus `run-input-sensitivity-destination`                                  | Same family; destination change is visible                      |
-| 15–35s   | Verify hero: incomplete empty-page repair RED; injected chip                                           | Ordinary tests green; this assertion still fails                |
-| 35–65s   | Original RED, correct GREEN; unknown kept; new `operation_id` allowed                                  | The test changes the decision without blocking legitimate work  |
-| 65–90s   | Bake-off strip: weak / Invariant / capable agent; usefulness author-review clock                       | Tie or unfinished stays labeled; no superiority unless measured |
-| 90–110s  | Publish: live GitHub PR + bound Actions + Linear comment + Slack thread reply                          | Engineering work delivered into the three apps                  |
-| 110–120s | Origin badge (`model:groq+gemini` interpret; generate is labeled template); `superiority_claim: false` | Evidence, not theater                                           |
+| Time | Show | Takeaway |
+| --- | --- | --- |
+| 0–15s | Controlled lost-ack duplicate on original `blind_retry` (observer count 2) | The engineering cost is a second write under the same `operation_id` |
+| 15–35s | Incident + Linear acceptance → grounded contract with source spans | Fields come from sources; invented values are ungrounded |
+| 35–75s | Same generated file, hash `0154894c…`: original RED, incomplete empty-page RED, correct GREEN, shared-session new op GREEN | The regression rejects the bug and the incomplete fix without blocking legitimate work |
+| 75–100s | PR 1, `execution-manifest.json`, Slack reply, Linear comment | Three-app evidence; CI binds an observed blob hash |
+| 100–120s | Scope: injected notifier family; `scenario-compiler:model:groq`; `superiority_claim: false`; remaining: your review, this video, PR merge | Honest limits |
 
-Backup: this document plus `results/workflow.json` if a service is blocked.
+Backup: this document plus `results/workflow.json` and `docs/GENERATION_DIAGNOSIS.md` if a service is blocked.

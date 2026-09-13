@@ -27,6 +27,9 @@ build/
 # Operator scratch and live dumps (not the frozen pack)
 runs/*/secrets/
 results/live-*.json
+results/generation-candidates/*
+!results/generation-candidates/README.md
+!results/generation-candidates/ef1a232-groq/
 results/baseline.md
 results/_baseline_*
 results/demo/

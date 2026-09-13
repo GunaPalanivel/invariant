@@ -1,0 +1,7 @@
+{
+  "origin": "model:groq",
+  "validation_commit": "ef1a2325ef8f659838565b0101f130c715b0beb9",
+  "class": "construction",
+  "reason": "AttributeError: tuple has no attribute adapter; make_session returns a tuple",
+  "not_the_verified_pack": true
+}

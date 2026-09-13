@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-09-13T15:21:33.242866+00:00",
+  "recorded_at": "2026-09-13T23:08:28.427460+00:00",
   "incident": "cases/e4/incident.json",
   "same_aut": "apps/notifier plus GunaPalanivel/invariant-validation",
   "same_tools": [
@@ -9,7 +9,7 @@
   ],
   "invariant": {
     "pack_valid": true,
-    "wall_seconds_local": 0.3929,
+    "wall_seconds_local": 1.1678,
     "interpret_origin": "model:groq+gemini",
     "generation_origin": "disclosed_template",
     "github_pr": "https://github.com/GunaPalanivel/invariant-validation/pull/1",
@@ -40,10 +40,23 @@
     "minutes_to_reviewer_accepted_regression": "unfinished"
   },
   "second_baseline": {
-    "status": "unfinished",
+    "status": "ran",
     "label": "groq second baseline, local only",
-    "reason": "RuntimeError (no fabricated result)",
-    "minutes_to_reviewer_accepted_regression": "unfinished"
+    "provider": "model:groq",
+    "wall_seconds_local": 4.2035,
+    "usage": {
+      "input_tokens": 1518,
+      "output_tokens": 1536
+    },
+    "valid_python": true,
+    "validation_reason": "ok",
+    "coverage": {
+      "valid_python": true,
+      "mentions_incomplete_repair": true,
+      "mentions_new_operation_id": false,
+      "mentions_unknown": false
+    },
+    "minutes_to_reviewer_accepted_regression": "unfinished \u2014 no separate PR from this agent"
   },
   "holdout": {
     "expected_intent_path": "cases/holdout/expected_intent.json",
@@ -64,7 +77,7 @@
     "invariant_minutes": "PR open; merge still the reviewer's clock; author review, not customer validation",
     "capable_agent_minutes": "unfinished",
     "reviewer": "operator of GunaPalanivel/invariant-validation",
-    "author_review_wall_seconds": 0.3929,
+    "author_review_wall_seconds": 1.1678,
     "tie": false,
     "superiority_claim": false
   },
