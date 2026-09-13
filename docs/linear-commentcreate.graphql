@@ -1,0 +1,10 @@
+"""Linear commentCreate shape used by the broker. Description is never overwritten."""
+
+COMMENT_CREATE = """
+mutation CommentCreate($issueId: String!, $body: String!) {
+  commentCreate(input: { issueId: $issueId, body: $body }) {
+    success
+    comment { id body }
+  }
+}
+"""

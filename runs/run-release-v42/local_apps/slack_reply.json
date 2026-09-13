@@ -1,0 +1,7 @@
+{
+  "channel_id": "C-RELEASES",
+  "thread_ts": "1726200000.000100",
+  "reply_ts": "1726200000.000100.reply",
+  "text": "Invariant finding (injected transport): original duplicate and incomplete empty-page retry rejected; correct recovery preserves unknown after lost ack.",
+  "mode": "local_journal"
+}

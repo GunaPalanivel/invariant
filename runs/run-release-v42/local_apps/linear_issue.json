@@ -1,0 +1,14 @@
+{
+  "id": "INV-18",
+  "description": "ORIGINAL DESCRIPTION MUST BE PRESERVED",
+  "comments": [
+    {
+      "id": "comment-run-release-v42",
+      "body": "Invariant finding (injected transport): original duplicate and incomplete empty-page retry rejected; correct recovery preserves unknown after lost ack."
+    },
+    {
+      "id": "comment-run-release-v42",
+      "body": "Invariant finding (injected transport): original duplicate and incomplete empty-page retry rejected; correct recovery preserves unknown after lost ack."
+    }
+  ]
+}

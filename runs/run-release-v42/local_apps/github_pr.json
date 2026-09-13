@@ -1,0 +1,9 @@
+{
+  "number": 1,
+  "branch": "invariant/regression-release-v42",
+  "head_sha": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+  "body": "Invariant finding (injected transport): original duplicate and incomplete empty-page retry rejected; correct recovery preserves unknown after lost ack.",
+  "mode": "local_journal",
+  "ci_bound": false,
+  "unbound_reason": "unbound \u2014 no hosted CI; local content hash only"
+}

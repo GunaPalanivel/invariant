@@ -1,0 +1,473 @@
+{
+  "simulated": true,
+  "injected_faults": true,
+  "live_apps": false,
+  "interpret_origin": "disclosed_template",
+  "generation_origin": "disclosed_template",
+  "generation_reason": "no live model",
+  "model_usage": {},
+  "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+  "generated_test_path": "None",
+  "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+  "handwritten_test_hash": "08d84ba25f2111bf580057063b9c3dbb61def59f9dfeb93d581211357705996c",
+  "detections": {
+    "intended_assertion_passed": 4,
+    "intended_assertion_failed": 3,
+    "invalid_test": 0,
+    "skipped": 0,
+    "infrastructure_failure": 0
+  },
+  "pack": {
+    "valid": true,
+    "required_findings_caught": true,
+    "required_passes_ok": true,
+    "unknown_not_painted_complete": true,
+    "matches_expected_intent": true
+  },
+  "cases": [
+    {
+      "case_id": "original_blind_retry_committed",
+      "note": "resent without checking state",
+      "assertion": {
+        "named_assertion": "no_duplicate_for_operation",
+        "passed": false,
+        "expected": "exactly one message for (destination, operation_id, content)",
+        "observed": "message_count=2 claimed_complete=True",
+        "violated_invariant": "same operation_id must not be written twice",
+        "next_action": "keep the original write; do not retry that operation_id",
+        "result_class": "intended_assertion_failed",
+        "application_outcome": "incomplete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 2,
+        "duplicate": true,
+        "application_outcome": "incomplete",
+        "communication_accuracy": "claimed_complete_with_duplicate",
+        "evidence_quality": "injected",
+        "task_completion": "incomplete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_failed",
+          "application_outcome": "incomplete"
+        },
+        "result_class": "intended_assertion_failed",
+        "named_assertion": "no_duplicate_for_operation",
+        "test_origin": "generated",
+        "application_outcome": "incomplete",
+        "case_id": "original_blind_retry_committed"
+      }
+    },
+    {
+      "case_id": "blanket_stop_never_dispatched",
+      "note": "stopped without reconciling",
+      "assertion": {
+        "named_assertion": "completes_missing_work",
+        "passed": false,
+        "expected": "never-dispatched write is sent once and completed",
+        "observed": "message_count=0 refused=True complete=False",
+        "violated_invariant": "safe non-action must not leave required work unsent",
+        "next_action": "send once under the never-dispatched protocol",
+        "result_class": "intended_assertion_failed",
+        "application_outcome": "incomplete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 0,
+        "duplicate": false,
+        "application_outcome": "incomplete",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "incomplete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_failed",
+          "application_outcome": "incomplete"
+        },
+        "result_class": "intended_assertion_failed",
+        "named_assertion": "completes_missing_work",
+        "test_origin": "generated",
+        "application_outcome": "incomplete",
+        "case_id": "blanket_stop_never_dispatched"
+      }
+    },
+    {
+      "case_id": "incomplete_search_then_retry_degraded",
+      "note": "resent because the query returned no rows",
+      "assertion": {
+        "named_assertion": "no_duplicate_for_operation",
+        "passed": false,
+        "expected": "exactly one message for (destination, operation_id, content)",
+        "observed": "message_count=2 claimed_complete=True",
+        "violated_invariant": "same operation_id must not be written twice",
+        "next_action": "keep the original write; do not retry that operation_id",
+        "result_class": "intended_assertion_failed",
+        "application_outcome": "incomplete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 2,
+        "duplicate": true,
+        "application_outcome": "incomplete",
+        "communication_accuracy": "claimed_complete_with_duplicate",
+        "evidence_quality": "injected",
+        "task_completion": "incomplete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_failed",
+          "application_outcome": "incomplete"
+        },
+        "result_class": "intended_assertion_failed",
+        "named_assertion": "no_duplicate_for_operation",
+        "test_origin": "generated",
+        "application_outcome": "incomplete",
+        "case_id": "incomplete_search_then_retry_degraded"
+      }
+    },
+    {
+      "case_id": "correct_committed",
+      "note": "confirmed present; no resend",
+      "assertion": {
+        "named_assertion": "committed_resolved_once",
+        "passed": true,
+        "expected": "dispatched write confirmed present; no duplicate; task complete",
+        "observed": "message_count=1 complete=True refused=False",
+        "violated_invariant": "",
+        "next_action": "none",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "complete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "complete",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "complete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "complete"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "committed_resolved_once",
+        "test_origin": "generated",
+        "application_outcome": "complete",
+        "case_id": "correct_committed"
+      }
+    },
+    {
+      "case_id": "correct_never_dispatched",
+      "note": "never dispatched; sent once",
+      "assertion": {
+        "named_assertion": "completes_missing_work",
+        "passed": true,
+        "expected": "never-dispatched write is sent once and completed",
+        "observed": "message_count=1 refused=False complete=True",
+        "violated_invariant": "",
+        "next_action": "none",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "complete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "complete",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "complete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "complete"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "completes_missing_work",
+        "test_origin": "generated",
+        "application_outcome": "complete",
+        "case_id": "correct_never_dispatched"
+      }
+    },
+    {
+      "case_id": "correct_legitimate_new_op",
+      "note": "acked",
+      "assertion": {
+        "named_assertion": "legitimate_second_op_allowed",
+        "passed": true,
+        "expected": "new operation_id with identical text is sent once",
+        "observed": "message_count=1 complete=True",
+        "violated_invariant": "",
+        "next_action": "none",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "complete"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42-followup",
+        "content": "Release v42 shipped to production.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "complete",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "complete"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "complete"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "legitimate_second_op_allowed",
+        "test_origin": "generated",
+        "application_outcome": "complete",
+        "case_id": "correct_legitimate_new_op"
+      }
+    },
+    {
+      "case_id": "correct_unknown_degraded_committed",
+      "note": "dispatched write with inconclusive read; no second send",
+      "assertion": {
+        "named_assertion": "unknown_after_ambiguous_dispatch",
+        "passed": true,
+        "expected": "no retry of that operation_id; outcome unknown; not claimed complete",
+        "observed": "send_attempts=1 count=1 complete=False unresolved=True",
+        "violated_invariant": "",
+        "next_action": "escalate; leave unresolved",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "unknown"
+      },
+      "outcome": {
+        "destination": "C-RELEASES",
+        "operation_id": "release-note-v42",
+        "content": "Release v42 shipped to production.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "unknown",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "unknown"
+      },
+      "verification": {
+        "workflow_id": "wf-release-v42",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "unknown"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "unknown_after_ambiguous_dispatch",
+        "test_origin": "generated",
+        "application_outcome": "unknown",
+        "case_id": "correct_unknown_degraded_committed"
+      }
+    }
+  ],
+  "holdout_cases": [
+    {
+      "case_id": "holdout_original_duplicate",
+      "note": "resent without checking state",
+      "assertion": {
+        "named_assertion": "no_duplicate_for_operation",
+        "passed": false,
+        "expected": "exactly one message for (destination, operation_id, content)",
+        "observed": "message_count=2 claimed_complete=True",
+        "violated_invariant": "same operation_id must not be written twice",
+        "next_action": "keep the original write; do not retry that operation_id",
+        "result_class": "intended_assertion_failed",
+        "application_outcome": "incomplete"
+      },
+      "outcome": {
+        "destination": "C-HOLDOUT",
+        "operation_id": "changelog-2026-09-13",
+        "content": "Changelog published for 2026-09-13.",
+        "message_count": 2,
+        "duplicate": true,
+        "application_outcome": "incomplete",
+        "communication_accuracy": "claimed_complete_with_duplicate",
+        "evidence_quality": "injected",
+        "task_completion": "incomplete"
+      },
+      "verification": {
+        "workflow_id": "wf-holdout-changelog",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_failed",
+          "application_outcome": "incomplete"
+        },
+        "result_class": "intended_assertion_failed",
+        "named_assertion": "no_duplicate_for_operation",
+        "test_origin": "generated",
+        "application_outcome": "incomplete",
+        "case_id": "holdout_original_duplicate"
+      }
+    },
+    {
+      "case_id": "holdout_incomplete_degraded",
+      "note": "resent because the query returned no rows",
+      "assertion": {
+        "named_assertion": "no_duplicate_for_operation",
+        "passed": false,
+        "expected": "exactly one message for (destination, operation_id, content)",
+        "observed": "message_count=2 claimed_complete=True",
+        "violated_invariant": "same operation_id must not be written twice",
+        "next_action": "keep the original write; do not retry that operation_id",
+        "result_class": "intended_assertion_failed",
+        "application_outcome": "incomplete"
+      },
+      "outcome": {
+        "destination": "C-HOLDOUT",
+        "operation_id": "changelog-2026-09-13",
+        "content": "Changelog published for 2026-09-13.",
+        "message_count": 2,
+        "duplicate": true,
+        "application_outcome": "incomplete",
+        "communication_accuracy": "claimed_complete_with_duplicate",
+        "evidence_quality": "injected",
+        "task_completion": "incomplete"
+      },
+      "verification": {
+        "workflow_id": "wf-holdout-changelog",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_failed",
+          "application_outcome": "incomplete"
+        },
+        "result_class": "intended_assertion_failed",
+        "named_assertion": "no_duplicate_for_operation",
+        "test_origin": "generated",
+        "application_outcome": "incomplete",
+        "case_id": "holdout_incomplete_degraded"
+      }
+    },
+    {
+      "case_id": "holdout_correct_unknown",
+      "note": "dispatched write with inconclusive read; no second send",
+      "assertion": {
+        "named_assertion": "unknown_after_ambiguous_dispatch",
+        "passed": true,
+        "expected": "no retry of that operation_id; outcome unknown; not claimed complete",
+        "observed": "send_attempts=1 count=1 complete=False unresolved=True",
+        "violated_invariant": "",
+        "next_action": "escalate; leave unresolved",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "unknown"
+      },
+      "outcome": {
+        "destination": "C-HOLDOUT",
+        "operation_id": "changelog-2026-09-13",
+        "content": "Changelog published for 2026-09-13.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "unknown",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "unknown"
+      },
+      "verification": {
+        "workflow_id": "wf-holdout-changelog",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "unknown"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "unknown_after_ambiguous_dispatch",
+        "test_origin": "generated",
+        "application_outcome": "unknown",
+        "case_id": "holdout_correct_unknown"
+      }
+    },
+    {
+      "case_id": "holdout_correct_send_once",
+      "note": "never dispatched; sent once",
+      "assertion": {
+        "named_assertion": "completes_missing_work",
+        "passed": true,
+        "expected": "never-dispatched write is sent once and completed",
+        "observed": "message_count=1 refused=False complete=True",
+        "violated_invariant": "",
+        "next_action": "none",
+        "result_class": "intended_assertion_passed",
+        "application_outcome": "complete"
+      },
+      "outcome": {
+        "destination": "C-HOLDOUT",
+        "operation_id": "changelog-2026-09-13",
+        "content": "Changelog published for 2026-09-13.",
+        "message_count": 1,
+        "duplicate": false,
+        "application_outcome": "complete",
+        "communication_accuracy": "matches_observer",
+        "evidence_quality": "injected",
+        "task_completion": "complete"
+      },
+      "verification": {
+        "workflow_id": "wf-holdout-changelog",
+        "run_attempt": 1,
+        "aut_revision": "fb43534ae63c4b566011148d06acf2dd356a6d8199af762cf41728c2488654ea",
+        "generated_test_hash": "651f76f9c66e519d8b5080d56c9e5a1031de5b216f34114cad78ab6f015ab29e",
+        "required_outcomes": {
+          "result_class": "intended_assertion_passed",
+          "application_outcome": "complete"
+        },
+        "result_class": "intended_assertion_passed",
+        "named_assertion": "completes_missing_work",
+        "test_origin": "generated",
+        "application_outcome": "complete",
+        "case_id": "holdout_correct_send_once"
+      }
+    }
+  ],
+  "forbidden_aut_imports": [],
+  "forbidden_generator_imports": []
+}

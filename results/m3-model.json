@@ -1,0 +1,13 @@
+{
+  "interpret_origin": "model:groq+gemini",
+  "generation_origin": "disclosed_template",
+  "generation_reason": "model blob invalid_test (generated tests errored or failed on the AUT); template used",
+  "usage": {
+    "input_tokens": 1725,
+    "output_tokens": 811
+  },
+  "model": "gemini-3.7-flash",
+  "grounded": true,
+  "destination": "C-RELEASES",
+  "operation_id": "release-note-v42"
+}

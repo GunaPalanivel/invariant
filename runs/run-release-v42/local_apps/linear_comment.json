@@ -1,0 +1,5 @@
+{
+  "id": "comment-run-release-v42",
+  "issue_id": "INV-18",
+  "body": "Invariant finding (injected transport): original duplicate and incomplete empty-page retry rejected; correct recovery preserves unknown after lost ack."
+}

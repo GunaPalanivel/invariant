@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-09-13T15:21:28.018186+00:00",
+  "live_apps": {
+    "slack": {
+      "configured": true,
+      "status": "ready",
+      "reason": null
+    },
+    "linear": {
+      "configured": true,
+      "status": "ready",
+      "reason": null
+    },
+    "github": {
+      "configured": true,
+      "status": "ready",
+      "reason": null
+    }
+  },
+  "model": {
+    "configured": true,
+    "primary": "gemini-3.7-flash",
+    "fallback": "openai/gpt-oss-120b",
+    "gemini_configured": true,
+    "groq_configured": true,
+    "pinned": "gemini-3.7-flash",
+    "status": "ready",
+    "note": "Keys stay in the broker. Generated tests do not receive production tokens."
+  },
+  "version_control": "local git initialized; product workspace is not published to invariant-validation",
+  "three_app_eligibility": "credentials_present_not_yet_authorized"
+}

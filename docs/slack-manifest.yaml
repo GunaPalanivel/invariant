@@ -1,0 +1,19 @@
+display_information: Invariant
+features:
+  bot_user:
+    display_name: Invariant
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - groups:history
+settings:
+  event_subscriptions: {}
+metadata:
+  # Workspace-visible, not a secret, not an idempotency key.
+  # Lookup via conversations.history?include_all_metadata=true with pagination.
+  event_types:
+    - name: invariant_operation
+      description: Operation identity for release-notifier posts (event_payload.operation_id)

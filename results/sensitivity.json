@@ -1,0 +1,20 @@
+{
+  "run_id": "run-input-sensitivity-destination",
+  "prepared": "author-prepared",
+  "interpret_origin": "model:gemini+groq",
+  "generation_origin": "disclosed_template",
+  "destination": "C-STAGING",
+  "operation_id": "release-note-v42",
+  "assertion_moved": true,
+  "rejects_previous_destination": true,
+  "grounded": true,
+  "ungrounded_fields": [],
+  "generated_test_hash": "75d415b1fecdce5aede69695b8de16c5d9dc67fec49e9fff3720960a8a5f752a",
+  "invalid_test": true,
+  "usage": {
+    "input_tokens": 1256,
+    "output_tokens": 690
+  },
+  "published": false,
+  "note": "Local only. Journal GET blocks a second GitHub PR."
+}

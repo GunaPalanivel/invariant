@@ -1,0 +1,75 @@
+{
+  "recorded_at": "2026-09-13T15:21:33.242866+00:00",
+  "incident": "cases/e4/incident.json",
+  "same_aut": "apps/notifier plus GunaPalanivel/invariant-validation",
+  "same_tools": [
+    "injected Slack adapter",
+    "observer",
+    "GitHub PR broker"
+  ],
+  "invariant": {
+    "pack_valid": true,
+    "wall_seconds_local": 0.3929,
+    "interpret_origin": "model:groq+gemini",
+    "generation_origin": "disclosed_template",
+    "github_pr": "https://github.com/GunaPalanivel/invariant-validation/pull/1",
+    "correction_minutes": 0,
+    "minutes_to_reviewer_accepted_regression": "PR opened; human merge/accept still the reviewer's clock",
+    "detections": {
+      "intended_assertion_passed": 4,
+      "intended_assertion_failed": 3,
+      "invalid_test": 0,
+      "skipped": 0,
+      "infrastructure_failure": 0
+    }
+  },
+  "weak_control": {
+    "label": "weak handwritten response-only control",
+    "not_a_coding_agent": true,
+    "claimed_complete": true,
+    "observer_duplicate": true,
+    "false_acceptance_of_original_bug": true,
+    "named_assertion_result_class": "intended_assertion_failed",
+    "wall_seconds_local": 0.0001,
+    "minutes_to_reviewer_accepted_regression": "not applicable \u2014 labeled weak, not submitted as the agent"
+  },
+  "capable_agent": {
+    "status": "unfinished",
+    "reason": "live model not configured",
+    "wall_seconds_local": null,
+    "minutes_to_reviewer_accepted_regression": "unfinished"
+  },
+  "second_baseline": {
+    "status": "unfinished",
+    "label": "groq second baseline, local only",
+    "reason": "RuntimeError (no fabricated result)",
+    "minutes_to_reviewer_accepted_regression": "unfinished"
+  },
+  "holdout": {
+    "expected_intent_path": "cases/holdout/expected_intent.json",
+    "authored_before_generation": true,
+    "file_mtime_utc": "2026-09-13T11:20:37.538353+00:00",
+    "all_required_outcomes_met": true,
+    "case_ids": [
+      "holdout_original_duplicate",
+      "holdout_incomplete_degraded",
+      "holdout_correct_unknown",
+      "holdout_correct_send_once"
+    ]
+  },
+  "usefulness": {
+    "clock_start": "shared intake packet cases/e4/incident.json",
+    "clock_stop": "reviewer-accepted regression including corrections",
+    "reviewer_kind": "author",
+    "invariant_minutes": "PR open; merge still the reviewer's clock; author review, not customer validation",
+    "capable_agent_minutes": "unfinished",
+    "reviewer": "operator of GunaPalanivel/invariant-validation",
+    "author_review_wall_seconds": 0.3929,
+    "tie": false,
+    "superiority_claim": false
+  },
+  "budget": {
+    "model": "model:groq+gemini",
+    "live_model_auth": "live model not configured"
+  }
+}
