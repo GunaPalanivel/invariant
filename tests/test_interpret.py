@@ -37,14 +37,29 @@ class TestInterpret(unittest.TestCase):
                     "destination": "C-RELEASES",
                     "operation_id": "release-note-v42",
                     "content": "Release v42 shipped to production.",
-                    "completion_rule": "at most one message per operation",
+                    "completion_rule": "at most one message for that operation",
                     "source_spans": [
                         {
                             "field": "destination",
                             "source": "slack",
                             "locator": "1726200000.000100",
                             "excerpt": "C-RELEASES",
-                        }
+                        },
+                        {
+                            "field": "operation_id",
+                            "source": "slack",
+                            "excerpt": "release-note-v42",
+                        },
+                        {
+                            "field": "content",
+                            "source": "slack",
+                            "excerpt": "Release v42 shipped to production.",
+                        },
+                        {
+                            "field": "completion_rule",
+                            "source": "linear",
+                            "excerpt": "at most one message for that operation",
+                        },
                     ],
                 },
                 "RAW PACKET:": {

@@ -57,6 +57,15 @@ class Observer:
     def count(self, destination: str, operation_id: str, content: str | None = None) -> int:
         return len(self.store.matching(destination, operation_id, content))
 
+    def count_content(self, destination: str, content: str) -> int:
+        return len(
+            [
+                m
+                for m in self.store.in_destination(destination)
+                if m.content == content
+            ]
+        )
+
     def record(
         self,
         destination: str,

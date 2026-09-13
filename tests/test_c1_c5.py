@@ -111,8 +111,10 @@ class TestC5AllMandatoryFaultsRequired(unittest.TestCase):
             test_hash=sha256_text("c5"),
             workflow_id="wf-c5",
         )
-        full = pack_valid(executions)
+        full = pack_valid(executions, matrix={"ok": True})
         self.assertTrue(full["valid"])
+        self.assertTrue(full["checker_ok"])
+        self.assertFalse(pack_valid(executions)["valid"])
         mutated = [item for item in executions if item.case_id != "incomplete_search_then_retry_degraded"]
         # Dropping a required finding must not still score as valid.
         self.assertIn("incomplete_search_then_retry_degraded", [e.case_id for e in executions])
@@ -120,7 +122,7 @@ class TestC5AllMandatoryFaultsRequired(unittest.TestCase):
         by_id["incomplete_search_then_retry_degraded"].verification.result_class = (
             ExecutionResultClass.INTENDED_ASSERTION_PASSED
         )
-        self.assertFalse(pack_valid(executions)["valid"])
+        self.assertFalse(pack_valid(executions, matrix={"ok": True})["valid"])
 
 
 if __name__ == "__main__":

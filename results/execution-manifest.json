@@ -1,0 +1,57 @@
+{
+  "candidate_hash": "0154894c447e76d3ff80105524bf5b9d3b4bf5732fff97ad6036eaca4e407a19",
+  "aut_revision": "4cfeedf26e386e5f613802c4d36bd2e617dcea22b28163ee41a341dd507d4b39",
+  "ok": true,
+  "reason": "matrix holds",
+  "invalid_test": false,
+  "construction_error": false,
+  "runs": [
+    {
+      "implementation": "original",
+      "exit_code": 1,
+      "tests_run": 4,
+      "failures": [
+        "test_candidate.GeneratedAutRegression.test_empty_page_after_dispatch_does_not_retry",
+        "test_candidate.GeneratedAutRegression.test_lost_ack_does_not_duplicate"
+      ],
+      "errors": [],
+      "ok_for_impl": true,
+      "reason": "ok",
+      "classification": "ok"
+    },
+    {
+      "implementation": "incomplete",
+      "exit_code": 1,
+      "tests_run": 4,
+      "failures": [
+        "test_candidate.GeneratedAutRegression.test_empty_page_after_dispatch_does_not_retry"
+      ],
+      "errors": [],
+      "ok_for_impl": true,
+      "reason": "ok",
+      "classification": "ok"
+    },
+    {
+      "implementation": "correct",
+      "exit_code": 0,
+      "tests_run": 4,
+      "failures": [],
+      "errors": [],
+      "ok_for_impl": true,
+      "reason": "ok",
+      "classification": "ok"
+    },
+    {
+      "implementation": "content_dedup",
+      "exit_code": 1,
+      "tests_run": 4,
+      "failures": [
+        "test_candidate.GeneratedAutRegression.test_legitimate_new_operation_same_text"
+      ],
+      "errors": [],
+      "ok_for_impl": true,
+      "reason": "ok",
+      "classification": "ok"
+    }
+  ]
+}

@@ -12,8 +12,13 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def sha256_source_bytes(data: bytes) -> str:
+    """Hash source as GitHub/Linux would: LF newlines only."""
+    return sha256_bytes(data.replace(b"\r\n", b"\n").replace(b"\r", b"\n"))
+
+
 def sha256_text(text: str) -> str:
-    return sha256_bytes(text.encode("utf-8"))
+    return sha256_source_bytes(text.encode("utf-8"))
 
 
 def hash_paths(paths: list[Path]) -> str:

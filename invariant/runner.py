@@ -52,6 +52,9 @@ def run_case(
     adapter.arm_send(fault)
     adapter.arm_query(query)
     notifier = ReleaseNotifier(adapter)
+    prior = required_outcomes.get("prior_operation_id")
+    if prior:
+        notifier.announce(destination, str(prior), content, recovery=policy)
     report = notifier.announce(destination, operation_id, content, recovery=policy)
     dispatched_lost = bool(report.last_send and report.last_send.dispatched and not report.last_send.acknowledged)
     outcome = observer.record(
@@ -103,6 +106,11 @@ def run_expected_cases(
                 required_outcomes={
                     "result_class": spec["required_result_class"],
                     "application_outcome": spec["required_application_outcome"],
+                    **(
+                        {"prior_operation_id": spec["prior_operation_id"]}
+                        if spec.get("prior_operation_id")
+                        else {}
+                    ),
                 },
                 test_origin=test_origin,
                 test_hash=test_hash,

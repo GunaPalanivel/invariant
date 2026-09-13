@@ -144,6 +144,33 @@ def heuristic_contract(packet: dict[str, Any]) -> ModelDerivedContract:
     return contract
 
 
+MANDATORY_FIELDS = ("destination", "operation_id", "content", "completion_rule")
+
+
+def apply_source_evidence(derived: ModelDerivedContract, raw: str) -> ModelDerivedContract:
+    """Judge confidence cannot supply missing evidence."""
+    by_field: dict[str, list[SourceSpan]] = {}
+    for span in derived.source_spans:
+        by_field.setdefault(span.field, []).append(span)
+    missing: list[str] = []
+    for name in MANDATORY_FIELDS:
+        value = getattr(derived, name)
+        if not value:
+            missing.append(name)
+            continue
+        spans = [s for s in by_field.get(name, []) if s.excerpt and s.excerpt in raw]
+        if not spans:
+            missing.append(name)
+            continue
+        value_s = str(value)
+        supported = any(value_s in (s.excerpt or "") or (s.excerpt or "") in value_s for s in spans)
+        if not supported:
+            missing.append(name)
+    derived.ungrounded_fields = sorted(set(list(derived.ungrounded_fields) + missing))
+    derived.grounded = not derived.ungrounded_fields
+    return derived
+
+
 def interpret_incident(
     packet: dict[str, Any],
     llm: LLMClient | None = None,
@@ -161,20 +188,10 @@ def interpret_incident(
             user=f"RAW PACKET:\n{raw}\n\nDERIVED:\n{json.dumps(parsed)}",
         )
     )
-    span_fail = [s.field for s in derived.source_spans if s.excerpt and not s.grounded]
-    missing = [
-        name
-        for name, value in (
-            ("destination", derived.destination),
-            ("operation_id", derived.operation_id),
-            ("content", derived.content),
-            ("completion_rule", derived.completion_rule),
-        )
-        if not value
-    ]
-    ungrounded = sorted(set(span_fail + missing + list(judge.get("ungrounded_fields") or [])))
-    derived.ungrounded_fields = ungrounded
-    derived.grounded = bool(judge.get("grounded")) and not ungrounded
+    derived = apply_source_evidence(derived, raw)
+    extra = [str(name) for name in (judge.get("ungrounded_fields") or []) if name]
+    derived.ungrounded_fields = sorted(set(list(derived.ungrounded_fields) + extra))
+    derived.grounded = not derived.ungrounded_fields
     derived.contract_hash = _hash_contract(derived)
     return _reject_hostile_expansion(packet, derived)
 

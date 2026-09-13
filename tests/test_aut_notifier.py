@@ -78,7 +78,14 @@ class TestAutNotifier(unittest.TestCase):
 
     def test_legitimate_new_operation_same_text(self):
         adapter, observer, _ = make_session()
-        report = ReleaseNotifier(adapter).announce(
+        notifier = ReleaseNotifier(adapter)
+        notifier.announce(
+            "C-RELEASES",
+            "release-note-v42",
+            "Release v42 shipped to production.",
+            recovery="reconcile",
+        )
+        report = notifier.announce(
             "C-RELEASES",
             "release-note-v42-followup",
             "Release v42 shipped to production.",
@@ -92,6 +99,8 @@ class TestAutNotifier(unittest.TestCase):
             report,
         )
         self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
+        self.assertEqual(observer.count("C-RELEASES", "release-note-v42", "Release v42 shipped to production."), 1)
+        self.assertEqual(observer.count("C-RELEASES", "release-note-v42-followup", "Release v42 shipped to production."), 1)
 
     def test_dispatch_empty_read_unknown_no_second_write(self):
         adapter, observer, _ = make_session()

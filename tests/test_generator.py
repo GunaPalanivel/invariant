@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from invariant.generator import render_generated_tests, write_generated_tests, write_weak_control
+from invariant.generator import aut_source_bundle, render_generated_tests, write_generated_tests, write_weak_control
 from invariant.interpret import interpret_incident, load_incident
 
 
@@ -22,9 +22,10 @@ class TestGenerator(unittest.TestCase):
         self.assertIn("from apps.notifier.notifier import ReleaseNotifier", text)
         self.assertNotIn("ExpectedIntent", text)
         self.assertNotIn("generate_pack", text)
-        self.assertIn("test_original_bug_duplicate_is_a_finding", text)
-        self.assertIn("test_incomplete_repair_empty_page_is_a_finding", text)
-        self.assertIn("test_unknown_after_dispatch_incomplete_read", text)
+        self.assertIn("test_lost_ack_does_not_duplicate", text)
+        self.assertIn("test_empty_page_after_dispatch_does_not_retry", text)
+        self.assertNotIn("recovery=", text)
+        self.assertNotIn("def recover_reconcile", aut_source_bundle())
 
     def test_ungrounded_contract_does_not_fabricate_pack(self):
         packet = load_incident(ROOT / "cases" / "e4" / "incident.json")

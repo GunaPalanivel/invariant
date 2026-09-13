@@ -53,6 +53,7 @@
       "policy": "reconcile",
       "fault": null,
       "query": null,
+      "prior_operation_id": "release-note-v42",
       "operation_id": "release-note-v42-followup",
       "named_assertion": "legitimate_second_op_allowed",
       "required_result_class": "intended_assertion_passed",

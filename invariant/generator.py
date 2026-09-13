@@ -4,37 +4,33 @@ from __future__ import annotations
 
 import argparse
 import ast
+import json
 import os
 import re
-import unittest
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
+from invariant.candidate_runner import evaluate_candidate_matrix
 from invariant.hashing import ROOT, sha256_text
 from invariant.interpret import interpret_incident, load_incident
 from invariant.llm import LLMClient
 from invariant.models import ModelDerivedContract
 
 GENERATED_DIR = ROOT / "generated"
+CANDIDATE_DIR = ROOT / "results" / "generation-candidates"
 
 TEMPLATE = '''"""Generated AUT regression. test_origin: generated.
 
 Imports the notifier entrypoint. Does not import scoring keys or grader checks.
+Does not select a recovery policy; the runner selects the implementation.
 """
 from __future__ import annotations
 
 import unittest
 
 from apps.notifier.notifier import ReleaseNotifier
-from invariant.assertions import (
-    committed_resolved_once,
-    completes_missing_work,
-    legitimate_second_op_allowed,
-    no_duplicate_for_operation,
-    unknown_after_ambiguous_dispatch,
-)
 from invariant.harness import make_session
-from invariant.models import ExecutionResultClass
 
 DESTINATION = {destination!r}
 OPERATION_ID = {operation_id!r}
@@ -42,53 +38,38 @@ CONTENT = {content!r}
 CONTRACT_HASH = {contract_hash!r}
 
 
-def _run(policy: str, fault: str | None, query: str | None, operation_id: str = OPERATION_ID):
-    adapter, observer, _store = make_session()
-    adapter.arm_send(fault)
-    adapter.arm_query(query)
-    report = ReleaseNotifier(adapter).announce(DESTINATION, operation_id, CONTENT, recovery=policy)
-    return adapter, observer, report
-
-
 class GeneratedAutRegression(unittest.TestCase):
-    def test_original_bug_duplicate_is_a_finding(self):
-        _adapter, observer, report = _run("blind_retry", "commit_drop_ack", None)
-        result = no_duplicate_for_operation(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_FAILED)
+    def test_lost_ack_does_not_duplicate(self):
+        adapter, observer, _store = make_session()
+        adapter.arm_send("commit_drop_ack")
+        adapter.arm_query("complete")
+        ReleaseNotifier(adapter).announce(DESTINATION, OPERATION_ID, CONTENT)
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID, CONTENT), 1)
 
-    def test_incomplete_repair_empty_page_is_a_finding(self):
-        _adapter, observer, report = _run("search_then_retry", "commit_drop_ack", "truncated_empty")
-        result = no_duplicate_for_operation(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_FAILED)
-
-    def test_blanket_stop_leaves_missing_work(self):
-        _adapter, observer, report = _run("blanket_stop", "block_before_dispatch", None)
-        result = completes_missing_work(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_FAILED)
-
-    def test_correct_committed_no_duplicate(self):
-        _adapter, observer, report = _run("reconcile", "commit_drop_ack", "complete")
-        result = committed_resolved_once(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
-
-    def test_correct_never_dispatched_send_once(self):
-        _adapter, observer, report = _run("reconcile", "block_before_dispatch", None)
-        result = completes_missing_work(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
-
-    def test_legitimate_new_operation_same_text(self):
-        new_op = OPERATION_ID + "-followup"
-        _adapter, observer, report = _run("reconcile", None, None, operation_id=new_op)
-        result = legitimate_second_op_allowed(observer, DESTINATION, new_op, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
-
-    def test_unknown_after_dispatch_incomplete_read(self):
-        _adapter, observer, report = _run("reconcile", "commit_drop_ack", "truncated_empty")
-        result = unknown_after_ambiguous_dispatch(observer, DESTINATION, OPERATION_ID, CONTENT, report)
-        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
-        self.assertEqual(result.application_outcome.value, "unknown")
+    def test_empty_page_after_dispatch_does_not_retry(self):
+        adapter, observer, _store = make_session()
+        adapter.arm_send("commit_drop_ack")
+        adapter.arm_query("truncated_empty")
+        report = ReleaseNotifier(adapter).announce(DESTINATION, OPERATION_ID, CONTENT)
         self.assertEqual(observer.count(DESTINATION, OPERATION_ID, CONTENT), 1)
         self.assertEqual(report.send_attempts, 1)
+        self.assertTrue(report.claimed_unresolved)
+        self.assertFalse(report.claimed_complete)
+
+    def test_never_dispatched_sends_once(self):
+        adapter, observer, _store = make_session()
+        adapter.arm_send("block_before_dispatch")
+        ReleaseNotifier(adapter).announce(DESTINATION, OPERATION_ID, CONTENT)
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID, CONTENT), 1)
+
+    def test_legitimate_new_operation_same_text(self):
+        adapter, observer, _store = make_session()
+        notifier = ReleaseNotifier(adapter)
+        notifier.announce(DESTINATION, OPERATION_ID, CONTENT)
+        notifier.announce(DESTINATION, OPERATION_ID + "-followup", CONTENT)
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID, CONTENT), 1)
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID + "-followup", CONTENT), 1)
+        self.assertEqual(observer.count_content(DESTINATION, CONTENT), 2)
 
 
 if __name__ == "__main__":
@@ -125,23 +106,51 @@ if __name__ == "__main__":
     unittest.main()
 '''
 
+HARNESS_CONTRACT = """
+Public test-support contract (injected transport, not live Slack):
+
+- make_session() -> tuple[adapter, observer, store]
+  Unpack: adapter, observer, _store = make_session()
+  Do not treat the return value as a single object with .adapter.
+- adapter.arm_send('commit_drop_ack' | 'block_before_dispatch' | None)
+- adapter.arm_query('truncated_empty' | 'complete' | None)
+- ReleaseNotifier(adapter).announce(destination, operation_id, content)
+  Do not pass recovery=. The execution runner selects the implementation.
+- observer.count(destination, operation_id, content) -> int
+- observer.count_content(destination, content) -> int
+"""
 
 GENERATE_SYSTEM_PROMPT = """You write a Python unittest module against the release notifier
 application under test. Import ReleaseNotifier from apps.notifier.notifier.
 Use invariant.harness.make_session as the injected test transport (not live Slack).
-You may use invariant.assertions helpers if they help: no_duplicate_for_operation,
-completes_missing_work, committed_resolved_once, legitimate_second_op_allowed,
-unknown_after_ambiguous_dispatch.
+
+""" + HARNESS_CONTRACT + """
 
 The grounded contract fields destination, operation_id, and content are the
-intended write. Cover this family with adapter-visible faults only:
-arm_send('commit_drop_ack' | 'block_before_dispatch' | None) and
-arm_query('truncated_empty' | 'complete' | None). Policies: blind_retry,
-search_then_retry, blanket_stop, reconcile.
+intended write. Write real regressions (assert observer counts / send_attempts),
+not grader checks against result_class. Cover:
+- lost ack after dispatch must not duplicate
+- empty/truncated query after dispatch must not retry
+- never-dispatched attempt must send once
+- shared session: announce operation_id then operation_id-followup with the same
+  text; one effect per operation_id and two total
 
-Do not import scoring keys, gold patches, or evaluation answers.
+Do not import scoring keys, gold patches, policies.py repairs, or evaluation answers.
 Do not contact Slack, Linear, or GitHub.
 Return ONLY Python source, no markdown fences."""
+
+REPAIR_SYSTEM_PROMPT = GENERATE_SYSTEM_PROMPT + """
+
+The previous candidate failed to execute. Fix the construction error using the
+traceback. Keep the same behavioral assertions. Meaningful assertion failures
+against a buggy implementation are not errors to 'fix' by weakening tests.
+"""
+
+SCENARIO_SYSTEM_PROMPT = """Return ONLY JSON for this incident family:
+{"destination": str, "operation_id": str, "content": str,
+ "cover_lost_ack": true, "cover_empty_page": true,
+ "cover_never_dispatched": true, "cover_new_operation": true}
+Use the grounded contract fields. Do not invent a different operation."""
 
 
 @dataclass
@@ -151,13 +160,34 @@ class GenerationResult:
     invalid_test: bool
     reason: str
     path: Path | None = None
+    code_generation_origin: str = ""
+    scenario_origin: str = ""
+
+
+def persist_candidate(
+    *,
+    raw: str,
+    extracted: str,
+    prompt: str,
+    extra: dict,
+) -> Path:
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")
+    ident = f"{stamp}-{sha256_text(extracted or raw or prompt)[:12]}"
+    path = CANDIDATE_DIR / ident
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "prompt.txt").write_text(prompt, encoding="utf-8")
+    (path / "raw.txt").write_text(raw or "", encoding="utf-8")
+    (path / "extracted.py").write_text(extracted or "", encoding="utf-8")
+    (path / "exec.json").write_text(json.dumps(extra, indent=2) + "\n", encoding="utf-8")
+    return path
 
 
 def aut_source_bundle() -> str:
     parts = []
-    for name in ("adapter.py", "policies.py", "notifier.py"):
+    for name in ("adapter.py", "notifier.py"):
         path = ROOT / "apps" / "notifier" / name
         parts.append(f"# {name}\n{path.read_text(encoding='utf-8')}")
+    parts.append("# harness/assertion signatures\n" + HARNESS_CONTRACT)
     return "\n\n".join(parts)
 
 
@@ -170,23 +200,14 @@ def _strip_fences(text: str) -> str:
 
 
 def generated_pack_executes(text: str) -> tuple[bool, str]:
-    """Run the generated unittest against the AUT. Syntax-only packs are not enough."""
-    namespace: dict[str, object] = {"__name__": "generated_aut_candidate"}
-    try:
-        exec(compile(text, "generated_aut_candidate.py", "exec"), namespace)
-    except Exception as exc:
-        return False, f"exec failed ({type(exc).__name__})"
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    for obj in namespace.values():
-        if isinstance(obj, type) and issubclass(obj, unittest.TestCase) and obj is not unittest.TestCase:
-            suite.addTests(loader.loadTestsFromTestCase(obj))
-    if suite.countTestCases() < 3:
-        return False, "fewer than 3 executable tests"
-    result = unittest.TextTestRunner(stream=__import__("io").StringIO(), verbosity=0).run(suite)
-    if result.errors or result.failures:
-        return False, "generated tests errored or failed on the AUT"
-    return True, "ok"
+    """Run the candidate in isolated processes. In-process exec is not used."""
+    matrix = evaluate_candidate_matrix(text)
+    if matrix.ok:
+        return True, "ok"
+    prefix = "invalid_test" if matrix.invalid_test else "matrix"
+    if matrix.construction_error:
+        prefix = "construction"
+    return False, f"{prefix}: {matrix.reason}"
 
 
 def validate_generated_python(text: str) -> tuple[bool, str]:
@@ -218,49 +239,159 @@ def render_generated_tests(contract: ModelDerivedContract) -> str:
     )
 
 
-def generate_pack(contract: ModelDerivedContract, llm: LLMClient | None = None) -> GenerationResult:
-    """Model-authored tests when llm is set; disclosed template otherwise."""
-    if not contract.grounded:
-        raise ValueError("refusing to generate tests from an ungrounded contract")
-    if llm is None:
-        text = render_generated_tests(contract)
-        return GenerationResult(text, "disclosed_template", False, "no live model")
-    user = (
+def compile_scenario(spec: dict, contract: ModelDerivedContract) -> str:
+    """Deterministic compiler for this family. Model must supply incident fields."""
+    dest = spec.get("destination") or contract.destination
+    op = spec.get("operation_id") or contract.operation_id
+    content = spec.get("content") or contract.content
+    if dest != contract.destination or op != contract.operation_id or content != contract.content:
+        raise ValueError("scenario fields must match the grounded contract")
+    if not all(
+        [
+            spec.get("cover_lost_ack"),
+            spec.get("cover_empty_page"),
+            spec.get("cover_never_dispatched"),
+            spec.get("cover_new_operation"),
+        ]
+    ):
+        raise ValueError("scenario must cover the full family")
+    return render_generated_tests(contract)
+
+
+def _contract_user_payload(contract: ModelDerivedContract) -> str:
+    return (
         "GROUNDED CONTRACT JSON:\n"
         f"destination={contract.destination}\n"
         f"operation_id={contract.operation_id}\n"
         f"content={contract.content}\n"
         f"completion_rule={contract.completion_rule}\n"
         f"contract_hash={contract.contract_hash}\n\n"
-        "AUT SOURCE:\n"
+        "AUT SOURCE (public interfaces only; no reference repairs):\n"
         f"{aut_source_bundle()}\n"
     )
+
+
+def _try_blob(text: str, raw: str, prompt: str, origin_tag: str) -> tuple[bool, str, str]:
+    persist_candidate(
+        raw=raw,
+        extracted=text,
+        prompt=prompt,
+        extra={"origin": origin_tag, "stage": "validate"},
+    )
+    ok, reason = validate_generated_python(text)
+    if not ok:
+        persist_candidate(
+            raw=raw,
+            extracted=text,
+            prompt=prompt,
+            extra={"origin": origin_tag, "ok": False, "reason": reason, "class": "construction"},
+        )
+        return False, reason, "construction"
+    ok, reason = generated_pack_executes(text)
+    persist_candidate(
+        raw=raw,
+        extracted=text,
+        prompt=prompt,
+        extra={"origin": origin_tag, "ok": ok, "reason": reason},
+    )
+    if ok:
+        return True, reason, "ok"
+    if reason.startswith("construction"):
+        return False, reason, "construction"
+    if reason.startswith("invalid_test"):
+        return False, reason, "invalid_test"
+    return False, reason, "matrix"
+
+
+def generate_pack(contract: ModelDerivedContract, llm: LLMClient | None = None) -> GenerationResult:
+    """Model-authored tests when llm is set; disclosed template otherwise."""
+    if not contract.grounded:
+        raise ValueError("refusing to generate tests from an ungrounded contract")
+    template = render_generated_tests(contract)
+    if llm is None:
+        return GenerationResult(template, "disclosed_template", False, "no live model")
+    user = _contract_user_payload(contract)
+    last_reason = ""
+    last_class = "construction"
+    last_text = ""
     try:
         raw = llm.complete_text(GENERATE_SYSTEM_PROMPT, user, max_tokens=4000)
         text = _strip_fences(raw)
-        ok, reason = validate_generated_python(text)
+        last_text = text
+        ok, last_reason, last_class = _try_blob(text, raw, GENERATE_SYSTEM_PROMPT + "\n" + user, "attempt-0")
         if ok:
-            ok, reason = generated_pack_executes(text)
-        if not ok:
-            fallback = render_generated_tests(contract)
-            return GenerationResult(
-                fallback,
-                "disclosed_template",
-                True,
-                f"model blob invalid_test ({reason}); template used",
+            provider = getattr(llm, "origin_tag", None)
+            origin = provider() if callable(provider) else (
+                f"model:{getattr(llm, 'provider', 'model')}" if getattr(llm, "provider", None) else "model"
             )
-        provider = getattr(llm, "origin_tag", None)
-        origin = provider() if callable(provider) else (
-            f"model:{getattr(llm, 'provider', 'model')}" if getattr(llm, "provider", None) else "model"
-        )
-        return GenerationResult(text, origin, False, "model-authored unittest")
-    except Exception as exc:
-        fallback = render_generated_tests(contract)
+            return GenerationResult(
+                text, origin, False, "model-authored unittest", code_generation_origin=origin
+            )
+        if last_class in {"construction", "invalid_test"}:
+            for attempt in (1, 2):
+                repair_user = user + f"\n\nPREVIOUS TRACE/REASON:\n{last_reason}\n\nPREVIOUS SOURCE:\n{last_text}\n"
+                raw = llm.complete_text(REPAIR_SYSTEM_PROMPT, repair_user, max_tokens=4000)
+                text = _strip_fences(raw)
+                last_text = text
+                ok, last_reason, last_class = _try_blob(
+                    text, raw, REPAIR_SYSTEM_PROMPT + "\n" + repair_user, f"attempt-{attempt}"
+                )
+                if ok:
+                    provider = getattr(llm, "origin_tag", None)
+                    origin = provider() if callable(provider) else (
+                        f"model:{getattr(llm, 'provider', 'model')}" if getattr(llm, "provider", None) else "model"
+                    )
+                    return GenerationResult(
+                        text,
+                        origin,
+                        False,
+                        f"model-authored unittest after repair {attempt}",
+                        code_generation_origin=origin,
+                    )
+        try:
+            spec = llm.complete_json(SCENARIO_SYSTEM_PROMPT, user)
+            compiled = compile_scenario(spec, contract)
+            ok, reason = generated_pack_executes(compiled)
+            persist_candidate(
+                raw=json.dumps(spec),
+                extracted=compiled,
+                prompt=SCENARIO_SYSTEM_PROMPT,
+                extra={"origin": "scenario-compiler", "ok": ok, "reason": reason},
+            )
+            if ok:
+                provider = getattr(llm, "origin_tag", None)
+                origin = provider() if callable(provider) else "model"
+                return GenerationResult(
+                    compiled,
+                    f"scenario-compiler:{origin}",
+                    False,
+                    "compiled from model scenario spec",
+                    code_generation_origin="deterministic_compiler",
+                    scenario_origin=origin,
+                )
+            last_reason = f"{last_reason}; scenario compiler {reason}"
+        except Exception as exc:
+            last_reason = f"{last_reason}; scenario compiler {type(exc).__name__}"
         return GenerationResult(
-            fallback,
+            template,
+            "disclosed_template",
+            True,
+            f"model blob invalid_test ({last_reason}); template used",
+            code_generation_origin="disclosed_template",
+        )
+    except Exception as exc:
+        persist_candidate(
+            raw="",
+            extracted="",
+            prompt=user,
+            extra={"origin": "model-error", "reason": type(exc).__name__},
+        )
+        return GenerationResult(
+            template,
             "disclosed_template",
             True,
             f"model error ({type(exc).__name__}); template used",
+            code_generation_origin="disclosed_template",
         )
 
 

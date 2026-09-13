@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from invariant.access import write_report as write_access
+from invariant.candidate_runner import evaluate_candidate_matrix
 from invariant.generator import write_generated_tests, write_weak_control
 from invariant.hashing import ROOT, aut_revision_hash, sha256_text
 from invariant.interpret import interpret_incident_auto, load_incident
@@ -59,8 +60,8 @@ def detections(executions: list[CaseExecution]) -> dict[str, int]:
     return counts
 
 
-def pack_valid(executions: list[CaseExecution]) -> dict:
-    """C5: every required named fault must fail independently (and, not any)."""
+def pack_valid(executions: list[CaseExecution], matrix: dict | None = None) -> dict:
+    """Pack is valid only when the candidate matrix holds AND the independent checker agrees."""
     by_id = {item.case_id: item for item in executions}
     required_findings = [
         "original_blind_retry_committed",
@@ -76,22 +77,30 @@ def pack_valid(executions: list[CaseExecution]) -> dict:
     finding_ok = all(
         by_id[name].verification.result_class == ExecutionResultClass.INTENDED_ASSERTION_FAILED
         for name in required_findings
-    )
+        if name in by_id
+    ) and all(name in by_id for name in required_findings)
     pass_ok = all(
         by_id[name].verification.result_class == ExecutionResultClass.INTENDED_ASSERTION_PASSED
         for name in required_passes
-    )
+        if name in by_id
+    ) and all(name in by_id for name in required_passes)
     unknown_ok = (
-        by_id["correct_unknown_degraded_committed"].assertion.application_outcome.value
+        "correct_unknown_degraded_committed" in by_id
+        and by_id["correct_unknown_degraded_committed"].assertion.application_outcome.value
         == "unknown"
     )
     matches = all(result_matches_required(item) for item in executions)
+    checker_ok = finding_ok and pass_ok and unknown_ok and matches
+    matrix_ok = bool(matrix and matrix.get("ok"))
     return {
-        "valid": finding_ok and pass_ok and unknown_ok and matches,
+        "valid": checker_ok and matrix_ok,
+        "checker_ok": checker_ok,
+        "matrix_ok": matrix_ok,
         "required_findings_caught": finding_ok,
         "required_passes_ok": pass_ok,
         "unknown_not_painted_complete": unknown_ok,
         "matches_expected_intent": matches,
+        "checker_role": "independent",
     }
 
 
@@ -158,7 +167,7 @@ def build_console_run(
         "stages": {
             "intake": "pass",
             "contract": "pass" if contract.get("grounded") else "warn",
-            "generate": "pass",
+            "generate": "fail" if invalid_test else "pass",
             "verify": "pass" if pack["valid"] else "fail",
             "publish": journal.get("github_pr_status")
             or journal.get("slack_reply_status")
@@ -303,7 +312,8 @@ def evaluate() -> dict:
         workflow_id="wf-release-v42",
         run_attempt=1,
     )
-    pack = pack_valid(executions)
+    matrix = evaluate_candidate_matrix(generated_text, persist_manifest=True)
+    pack = pack_valid(executions, matrix=matrix.to_dict())
     aut_rev = aut_revision_hash()
     run_id = "run-release-v42"
     journal = publish_local(
@@ -350,11 +360,16 @@ def evaluate() -> dict:
         "generation_reason": gen.reason,
         "model_usage": model_usage,
         "aut_revision": aut_rev,
-        "generated_test_path": str(generated_path),
+        "generated_test_path": (
+            str(generated_path.relative_to(ROOT)).replace("\\", "/")
+            if generated_path
+            else "generated/test_generated_aut.py"
+        ),
         "generated_test_hash": test_hash,
         "handwritten_test_hash": handwritten_hash,
         "detections": detections(executions),
         "pack": pack,
+        "matrix": matrix.to_dict(),
         "cases": [execution_to_dict(item) for item in executions],
         "holdout_cases": [execution_to_dict(item) for item in holdout],
         "forbidden_aut_imports": _scan_forbidden_imports(

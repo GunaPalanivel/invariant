@@ -131,14 +131,17 @@ def legitimate_second_op_allowed(
     content: str,
     report: RecoveryReport,
 ) -> AssertionResult:
-    count = observer.count(destination, operation_id, content)
-    passed = count == 1 and report.claimed_complete
+    new_count = observer.count(destination, operation_id, content)
+    total = observer.count_content(destination, content)
+    passed = new_count == 1 and total == 2 and report.claimed_complete
     outcome = ApplicationOutcome.COMPLETE if passed else ApplicationOutcome.INCOMPLETE
     return AssertionResult(
         named_assertion="legitimate_second_op_allowed",
         passed=passed,
-        expected="new operation_id with identical text is sent once",
-        observed=f"message_count={count} complete={report.claimed_complete}",
+        expected="shared session: one effect per operation_id and two total for the same text",
+        observed=(
+            f"new_count={new_count} total_for_content={total} complete={report.claimed_complete}"
+        ),
         violated_invariant="" if passed else "identity is operation_id, not message text alone",
         application_outcome=outcome,
         result_class=classify(passed),

@@ -16,6 +16,7 @@ from apps.notifier.notifier import ReleaseNotifier
 from invariant.assertions import (
     committed_resolved_once,
     completes_missing_work,
+    legitimate_second_op_allowed,
     no_duplicate_for_operation,
     unknown_after_ambiguous_dispatch,
 )
@@ -73,6 +74,19 @@ class HandwrittenAutRegression(unittest.TestCase):
         observer, report = _run("reconcile", "commit_drop_ack", "truncated_empty")
         result = unknown_after_ambiguous_dispatch(observer, DESTINATION, OPERATION_ID, CONTENT, report)
         self.assertEqual(result.application_outcome.value, "unknown")
+        self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
+
+    def test_legitimate_new_operation_same_text(self):
+        adapter, observer, _store = make_session()
+        notifier = ReleaseNotifier(adapter)
+        notifier.announce(DESTINATION, OPERATION_ID, CONTENT, recovery="reconcile")
+        report = notifier.announce(DESTINATION, OPERATION_ID + "-followup", CONTENT, recovery="reconcile")
+        result = legitimate_second_op_allowed(
+            observer, DESTINATION, OPERATION_ID + "-followup", CONTENT, report
+        )
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID, CONTENT), 1)
+        self.assertEqual(observer.count(DESTINATION, OPERATION_ID + "-followup", CONTENT), 1)
+        self.assertEqual(observer.count_content(DESTINATION, CONTENT), 2)
         self.assertEqual(result.result_class, ExecutionResultClass.INTENDED_ASSERTION_PASSED)
 
 

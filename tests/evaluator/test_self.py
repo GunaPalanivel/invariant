@@ -28,4 +28,6 @@ class TestEvaluatorSelf(unittest.TestCase):
         counts = detections(executions)
         self.assertEqual(counts[ExecutionResultClass.INVALID_TEST.value], 0)
         self.assertGreaterEqual(counts[ExecutionResultClass.INTENDED_ASSERTION_FAILED.value], 3)
-        self.assertTrue(pack_valid(executions)["valid"])
+        self.assertTrue(pack_valid(executions, matrix={"ok": True})["valid"])
+        self.assertTrue(pack_valid(executions)["checker_ok"])
+        self.assertFalse(pack_valid(executions)["valid"])
