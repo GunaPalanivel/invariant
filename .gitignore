@@ -1,0 +1,42 @@
+# Research, competitor notes, prototype dumps — never publish
+Data/
+data/
+_zip_inspect/
+*.zip
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+credentials.json
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+
+# Operator scratch and live dumps (not the frozen pack)
+runs/*/secrets/
+results/live-*.json
+results/baseline.md
+results/_baseline_*
+results/demo/
+*.png
+
+# Validation clone must never live inside this product tree
+invariant-validation/
+
+# Editor / local
+.vscode/
+.idea/
+.cursor/
+*.swp
