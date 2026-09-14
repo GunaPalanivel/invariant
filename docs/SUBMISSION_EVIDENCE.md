@@ -51,7 +51,7 @@ Workflow finding (reread; GET-reuse): [`results/workflow.json`](../results/workf
 | Slack reply    | `1789306699.812559`                    | https://invariantlab.slack.com/archives/C0C1H02UHEW/p1789306699812559?thread_ts=1789306404.361089&cid=C0C1H02UHEW | published, reread                |
 | Linear comment | `d94a2b69-a255-4f44-a3a8-7f94f72d9dca` | https://linear.app/guna-palanivel/issue/GUN-5#comment-d94a2b69-a255-4f44-a3a8-7f94f72d9dca                        | published, description preserved |
 | GitHub PR      | 1                                      | https://github.com/GunaPalanivel/invariant-validation/pull/1                                                      | published, reused (no second PR) |
-| Actions        | `34765110314`                          | https://github.com/GunaPalanivel/invariant-validation/actions/runs/34765110314                                    | bound to `c74ea2d…`              |
+| Actions        | `34791637068`                          | https://github.com/GunaPalanivel/invariant-validation/actions/runs/34791637068                                    | bound to `2201925…`; matrix artifact hash `0154894c…` |
 
 ## Browser / demo
 
